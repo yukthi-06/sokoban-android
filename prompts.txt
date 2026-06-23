@@ -337,3 +337,4 @@ If you want, I can next generate:
 * the actual **full Android Studio project code**
 * or a **minimal working version (MVP)**
 * or a **JavaFX desktop version using the same engine**
+=======
