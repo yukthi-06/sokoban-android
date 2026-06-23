@@ -1,0 +1,27 @@
+<SOKOBAN_SOLVER_GRID>
+<span id="uas-port"/>
+<Id>24334</Id>
+<Name>Howard Levels 1 16</Name>
+<Licence/>
+<Url/>
+<Email/>
+<Author>Howard Abed</Author>
+<Serial>Howard Levels 1</Serial>
+<SerialNumber>16</SerialNumber>
+<SourceFile/>
+<Comment/>
+<Height>11</Height>
+<Width>15</Width>
+<NbBoxes>15</NbBoxes>
+<Date>2025-02-22 22:53:03.573692</Date>
+<SolverResult>1</SolverResult>
+<Pushes>183</Pushes>
+<Moves>625</Moves>
+<GridWithBlankSpaces>
+/###########/ ## ##/ # $ $@$ $ ##/ # $ $ $ $ $ #/ # $ $ $ $ $ #/ ###$######## #/ /# ##....## ##/ /# .....## #/ /##### #.. #/ /////#....#####/ /////######
+</GridWithBlankSpaces>
+<Rnd>9fQpADttYpcHXCfo</Rnd>
+<GridHash>276018847127673159</GridHash>
+<FrameHash>92684565274673833</FrameHash>
+<FrameAndBoxesHash>235481177541022185</FrameAndBoxesHash>
+</SOKOBAN_SOLVER_GRID>

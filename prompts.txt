@@ -1,0 +1,40 @@
+create an android application which is basically a "Sokoban" game
+The Game data is an XML of the form 
+```
+<SOKOBAN_SOLVER_GRID>
+<span id="uas-port"/>
+<Id>24334</Id>
+<Name>Howard Levels 1 16</Name>
+<Licence/>
+<Url/>
+<Email/>
+<Author>Howard Abed</Author>
+<Serial>Howard Levels 1</Serial>
+<SerialNumber>16</SerialNumber>
+<SourceFile/>
+<Comment/>
+<Height>11</Height>
+<Width>15</Width>
+<NbBoxes>15</NbBoxes>
+<Date>2025-02-22 22:53:03.573692</Date>
+<SolverResult>1</SolverResult>
+<Pushes>183</Pushes>
+<Moves>625</Moves>
+<GridWithBlankSpaces>
+/###########/ ## ##/ # $ $@$ $ ##/ # $ $ $ $ $ #/ # $ $ $ $ $ #/ ###$######## #/ /# ##....## ##/ /# .....## #/ /##### #.. #/ /////#....#####/ /////######
+</GridWithBlankSpaces>
+<Rnd>9fQpADttYpcHXCfo</Rnd>
+<GridHash>276018847127673159</GridHash>
+<FrameHash>92684565274673833</FrameHash>
+<FrameAndBoxesHash>235481177541022185</FrameAndBoxesHash>
+</SOKOBAN_SOLVER_GRID>
+```
+
+These data files are stored in a local folder as XML files.  Each is a game.
+develop the app in java (not kotlin)
+Make the 'game engine' modular, so that it can be re-used in any other java application(example in a deskop app using JavaFX)
+
+Give it as a single prompt to give to an agent to achieve this
+===================================================================================================
+The chatgpt output from above, use that to give prompt inside IDE
+
