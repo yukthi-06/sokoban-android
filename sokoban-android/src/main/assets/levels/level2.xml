@@ -1,0 +1,11 @@
+<SOKOBAN_SOLVER_GRID>
+<Id>1001</Id>
+<Name>Simple Test Level</Name>
+<Author>Sokoban Developer</Author>
+<Height>4</Height>
+<Width>7</Width>
+<NbBoxes>1</NbBoxes>
+<GridWithBlankSpaces>
+/#######/##@$.##/##   ##/#######
+</GridWithBlankSpaces>
+</SOKOBAN_SOLVER_GRID>

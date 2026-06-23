@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Sokoban Offline</string>
+    <string name="level_label">Level:</string>
+    <string name="moves_label">Moves: %1$d</string>
+    <string name="pushes_label">Pushes: %1$d</string>
+    <string name="restart_btn">Restart</string>
+    <string name="undo_btn">Undo</string>
+    <string name="victory_title">Victory!</string>
+    <string name="victory_message">You solved the level in %1$d moves and %2$d pushes!</string>
+    <string name="next_level_btn">Next Level</string>
+    <string name="congrats">Congratulations!</string>
+</resources>
