@@ -43,18 +43,6 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/bestStatsText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Best: --"
-                android:textAlignment="center"
-                android:textColor="#4CAF50"
-                android:textSize="14sp"
-                android:textStyle="italic"
-                android:visibility="gone"
-                android:layout_marginTop="4dp" />
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -85,6 +73,17 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Pushes: 0"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_light"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/timeText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Time: 0s"
                     android:textAlignment="center"
                     android:textColor="@color/text_light"
                     android:textSize="16sp"

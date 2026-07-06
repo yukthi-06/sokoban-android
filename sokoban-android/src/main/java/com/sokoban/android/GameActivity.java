@@ -41,9 +41,9 @@ public final class GameActivity extends AppCompatActivity {
     private static final String SOLUTIONS_DIR = "/sdcard/Vypeensoft/Sokoban/solutions/";
 
     private TextView levelTitleText;
-    private TextView bestStatsText;
     private TextView movesText;
     private TextView pushesText;
+    private TextView timeText;
     private GameView gameView;
     private Button btnReplay;
 
@@ -52,6 +52,26 @@ public final class GameActivity extends AppCompatActivity {
     private Handler replayHandler;
     private String replaySequence;
     private int replayIndex;
+
+    private int bestMoves = -1;
+    private int bestPushes = -1;
+    private long bestTime = -1;
+
+    private final Handler timerHandler = new Handler(Looper.getMainLooper());
+    private final Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (currentState != null && !GameEngine.isWin(currentState) && !isReplaying) {
+                if (bestMoves < 0 || currentState.getMovesCount() > 0) {
+                    long timeTaken = (System.currentTimeMillis() - startTime) / 1000;
+                    if (timeText != null) {
+                        timeText.setText("Time: " + timeTaken + "s");
+                    }
+                }
+                timerHandler.postDelayed(this, 1000);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +84,9 @@ public final class GameActivity extends AppCompatActivity {
         levelFiles = repository.getLevelFiles();
 
         levelTitleText = findViewById(R.id.levelTitleText);
-        bestStatsText = findViewById(R.id.bestStatsText);
         movesText = findViewById(R.id.movesText);
         pushesText = findViewById(R.id.pushesText);
+        timeText = findViewById(R.id.timeText);
         gameView = findViewById(R.id.gameView);
         btnReplay = findViewById(R.id.btnReplay);
 
@@ -116,6 +136,8 @@ public final class GameActivity extends AppCompatActivity {
         if (currentState != null) {
             currentState = GameEngine.restart(currentState);
             startTime = System.currentTimeMillis();
+            timerHandler.removeCallbacks(timerRunnable);
+            timerHandler.post(timerRunnable);
             updateUI();
         }
     }
@@ -130,6 +152,10 @@ public final class GameActivity extends AppCompatActivity {
                                      .replaceAll("\\s+", "")
                                      .replaceFirst("^0+(?!$)", "");
         
+        bestMoves = -1;
+        bestPushes = -1;
+        bestTime = -1;
+
         File solutionFile = new File(SOLUTIONS_DIR, currentDisplayName + "_solution.json");
         if (solutionFile.exists()) {
             levelTitleText.setText("Level " + currentDisplayName + " (Solved)");
@@ -137,13 +163,10 @@ public final class GameActivity extends AppCompatActivity {
             try {
                 String content = new String(Files.readAllBytes(Paths.get(solutionFile.getAbsolutePath())));
                 JSONObject json = new JSONObject(content);
-                int moves = json.optInt("moves count", 0);
-                int pushes = json.optInt("pushes count", 0);
-                long time = json.optLong("timetaken", 0);
+                bestMoves = json.optInt("moves count", 0);
+                bestPushes = json.optInt("pushes count", 0);
+                bestTime = json.optLong("timetaken", 0);
                 replaySequence = json.optString("sequence of moves", "");
-
-                bestStatsText.setVisibility(View.VISIBLE);
-                bestStatsText.setText(String.format("Best: %d moves, %d pushes, %ds", moves, pushes, time));
                 
                 if (!replaySequence.isEmpty()) {
                     btnReplay.setVisibility(View.VISIBLE);
@@ -153,17 +176,17 @@ public final class GameActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
                 btnReplay.setVisibility(View.GONE);
-                bestStatsText.setVisibility(View.GONE);
             }
         } else {
             levelTitleText.setText("Level " + currentDisplayName);
             levelTitleText.setTextColor(ContextCompat.getColor(this, R.color.accent));
-            bestStatsText.setVisibility(View.GONE);
             btnReplay.setVisibility(View.GONE);
         }
 
         currentState = repository.loadLevel(fileName);
         startTime = System.currentTimeMillis();
+        timerHandler.removeCallbacks(timerRunnable);
+        timerHandler.post(timerRunnable);
         updateUI();
     }
 
@@ -207,9 +230,6 @@ public final class GameActivity extends AppCompatActivity {
                 replayHandler.postDelayed(this, 500);
             } else {
                 stopReplay();
-                if (GameEngine.isWin(currentState)) {
-                    showWinDialog();
-                }
             }
         }
     };
@@ -254,6 +274,10 @@ public final class GameActivity extends AppCompatActivity {
     private void handleMoveInternal(Direction direction) {
         if (currentState == null || GameEngine.isWin(currentState)) return;
 
+        if (currentState.getMovesCount() == 0) {
+            startTime = System.currentTimeMillis();
+        }
+
         currentState = GameEngine.move(currentState, direction);
         updateUI();
 
@@ -296,8 +320,20 @@ public final class GameActivity extends AppCompatActivity {
     private void updateUI() {
         if (currentState == null) return;
         gameView.setGameState(currentState);
-        movesText.setText(getString(R.string.moves_label, currentState.getMovesCount()));
-        pushesText.setText(getString(R.string.pushes_label, currentState.getPushesCount()));
+        
+        long timeTaken = (System.currentTimeMillis() - startTime) / 1000;
+        
+        if (bestMoves >= 0 && currentState.getMovesCount() == 0 && !isReplaying) {
+            // Show best stats when viewing a solved level before making a move
+            movesText.setText(getString(R.string.moves_label, bestMoves));
+            pushesText.setText(getString(R.string.pushes_label, bestPushes));
+            if (timeText != null) timeText.setText("Time: " + bestTime + "s");
+        } else {
+            // Show current running stats (or replay stats)
+            movesText.setText(getString(R.string.moves_label, currentState.getMovesCount()));
+            pushesText.setText(getString(R.string.pushes_label, currentState.getPushesCount()));
+            if (timeText != null) timeText.setText("Time: " + timeTaken + "s");
+        }
     }
 
     private void showWinDialog() {
