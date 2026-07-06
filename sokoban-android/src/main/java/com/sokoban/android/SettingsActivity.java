@@ -16,6 +16,7 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView intervalValueText;
     private SeekBar intervalSeekBar;
     private SharedPreferences prefs;
+    private int selectedInterval;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +28,11 @@ public class SettingsActivity extends AppCompatActivity {
         intervalValueText = findViewById(R.id.intervalValueText);
         intervalSeekBar = findViewById(R.id.intervalSeekBar);
 
-        int currentInterval = prefs.getInt(KEY_REPLAY_INTERVAL, DEFAULT_REPLAY_INTERVAL);
+        selectedInterval = prefs.getInt(KEY_REPLAY_INTERVAL, DEFAULT_REPLAY_INTERVAL);
         
         // SeekBar range: 0-900 maps to 100-1000ms
-        intervalSeekBar.setProgress(currentInterval - 100);
-        updateIntervalText(currentInterval);
+        intervalSeekBar.setProgress(selectedInterval - 100);
+        updateIntervalText(selectedInterval);
 
         intervalSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -45,9 +46,13 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                int ms = seekBar.getProgress() + 100;
-                prefs.edit().putInt(KEY_REPLAY_INTERVAL, ms).apply();
+                selectedInterval = seekBar.getProgress() + 100;
             }
+        });
+
+        findViewById(R.id.btnSaveConfig).setOnClickListener(v -> {
+            prefs.edit().putInt(KEY_REPLAY_INTERVAL, selectedInterval).apply();
+            finish();
         });
     }
 
