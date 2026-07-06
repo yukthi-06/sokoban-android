@@ -48,6 +48,7 @@ public final class GameActivity extends AppCompatActivity {
     private TextView timeText;
     private GameView gameView;
     private Button btnReplay;
+    private Button btnUndo;
 
     private boolean isReplaying = false;
     private boolean isReplayPaused = false;
@@ -92,6 +93,7 @@ public final class GameActivity extends AppCompatActivity {
         timeText = findViewById(R.id.timeText);
         gameView = findViewById(R.id.gameView);
         btnReplay = findViewById(R.id.btnReplay);
+        btnUndo = findViewById(R.id.btnUndo);
 
         setupControls();
         loadLevel(currentLevelIndex);
@@ -101,7 +103,7 @@ public final class GameActivity extends AppCompatActivity {
         AndroidGameController controller = new AndroidGameController(this, this::handleMove);
         gameView.setOnTouchListener(controller);
 
-        findViewById(R.id.btnUndo).setOnClickListener(v -> {
+        btnUndo.setOnClickListener(v -> {
             if (isReplaying) {
                 promptInterruptReplay(() -> {
                     stopReplay();
@@ -347,6 +349,12 @@ public final class GameActivity extends AppCompatActivity {
                     timeText.setText("Time: " + timeTaken + "s");
                 }
             }
+        }
+        
+        if (currentState.getMovesCount() == 0) {
+            btnUndo.setVisibility(View.GONE);
+        } else {
+            btnUndo.setVisibility(View.VISIBLE);
         }
     }
 
