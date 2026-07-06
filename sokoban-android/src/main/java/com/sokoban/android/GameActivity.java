@@ -351,7 +351,7 @@ public final class GameActivity extends AppCompatActivity {
             }
         }
         
-        if (currentState.getMovesCount() == 0 || isReplaying) {
+        if (isReplaying || (bestMoves >= 0 && currentState.getMovesCount() == 0)) {
             btnUndo.setVisibility(View.GONE);
         } else {
             btnUndo.setVisibility(View.VISIBLE);
