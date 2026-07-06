@@ -339,7 +339,14 @@ public final class GameActivity extends AppCompatActivity {
             // Show current running stats (or replay stats)
             movesText.setText(getString(R.string.moves_label, currentState.getMovesCount()));
             pushesText.setText(getString(R.string.pushes_label, currentState.getPushesCount()));
-            if (timeText != null) timeText.setText("Time: " + timeTaken + "s");
+            
+            if (timeText != null) {
+                if (isReplaying && bestTime >= 0) {
+                    timeText.setText("Time: " + bestTime + "s");
+                } else {
+                    timeText.setText("Time: " + timeTaken + "s");
+                }
+            }
         }
     }
 
