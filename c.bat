@@ -1,4 +1,4 @@
 call sp
 call gradlew assembleDebug
 call cop.bat
-call ghd-adb.bat
+start cmd /k ghd-adb.bat
