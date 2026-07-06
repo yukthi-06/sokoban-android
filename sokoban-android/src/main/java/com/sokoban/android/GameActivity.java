@@ -6,6 +6,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONObject;
+import java.io.File;
+import java.io.FileWriter;
+
 import com.sokoban.android.controller.AndroidGameController;
 import com.sokoban.android.repository.LevelRepository;
 import com.sokoban.android.view.GameView;
@@ -23,6 +27,10 @@ public final class GameActivity extends AppCompatActivity {
     private List<String> levelFiles;
     private int currentLevelIndex = 0;
     private GameState currentState;
+    private long startTime;
+    private String currentDisplayName;
+    
+    private static final String SOLUTIONS_DIR = "/sdcard/Vypeensoft/Sokoban/solutions/";
 
     private TextView levelTitleText;
     private TextView movesText;
@@ -64,6 +72,7 @@ public final class GameActivity extends AppCompatActivity {
         findViewById(R.id.btnRestart).setOnClickListener(v -> {
             if (currentState != null) {
                 currentState = GameEngine.restart(currentState);
+                startTime = System.currentTimeMillis(); // Reset timer
                 updateUI();
             }
         });
@@ -75,12 +84,13 @@ public final class GameActivity extends AppCompatActivity {
         String fileName = levelFiles.get(index);
         
         // Format display name
-        String displayName = fileName.replace(".json", "")
+        currentDisplayName = fileName.replace(".json", "")
                                      .replaceAll("\\s+", "")
                                      .replaceFirst("^0+(?!$)", "");
-        levelTitleText.setText("Level " + displayName);
+        levelTitleText.setText("Level " + currentDisplayName);
 
         currentState = repository.loadLevel(fileName);
+        startTime = System.currentTimeMillis(); // Start timer
         updateUI();
     }
 
@@ -91,7 +101,33 @@ public final class GameActivity extends AppCompatActivity {
         updateUI();
 
         if (GameEngine.isWin(currentState)) {
+            saveSolution(currentDisplayName);
             showWinDialog();
+        }
+    }
+
+    private void saveSolution(String displayName) {
+        long timeTaken = (System.currentTimeMillis() - startTime) / 1000;
+        
+        File dir = new File(SOLUTIONS_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        
+        File solutionFile = new File(dir, displayName + "_solution.json");
+        try {
+            JSONObject json = new JSONObject();
+            json.put("moves count", currentState.getMovesCount());
+            json.put("pushes count", currentState.getPushesCount());
+            json.put("timetaken", timeTaken);
+            json.put("sequence of moves", currentState.getMoveSequence());
+            
+            FileWriter writer = new FileWriter(solutionFile);
+            writer.write(json.toString(4));
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

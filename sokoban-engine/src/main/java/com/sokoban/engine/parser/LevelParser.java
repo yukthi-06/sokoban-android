@@ -49,7 +49,7 @@ public final class LevelParser {
             playerPos = new Position(0, 0);
         }
 
-        return new GameState(id, name, author, width, height, grid, playerPos, 0, 0, null);
+        return new GameState(id, name, author, width, height, grid, playerPos, 0, 0, "", null);
     }
 
     public static GameState parse(InputStream inputStream) throws Exception {

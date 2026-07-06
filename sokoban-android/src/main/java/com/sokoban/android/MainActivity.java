@@ -37,12 +37,15 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        boolean hasPermission = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
-                if (levelFiles == null) {
-                    initializeDashboard();
-                }
-            }
+            hasPermission = Environment.isExternalStorageManager();
+        } else {
+            hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        }
+
+        if (hasPermission) {
+            initializeDashboard();
         }
     }
 
@@ -85,7 +88,20 @@ public final class MainActivity extends AppCompatActivity {
         levelFiles = repository.getLevelFiles();
         if (levelFiles == null || levelFiles.isEmpty()) return;
 
-        LevelAdapter adapter = new LevelAdapter(levelFiles, position -> {
+        java.util.Set<String> completedLevels = new java.util.HashSet<>();
+        java.io.File solDir = new java.io.File("/sdcard/Vypeensoft/Sokoban/solutions/");
+        if (solDir.exists() && solDir.isDirectory()) {
+            java.io.File[] files = solDir.listFiles();
+            if (files != null) {
+                for (java.io.File f : files) {
+                    if (f.getName().endsWith("_solution.json")) {
+                        completedLevels.add(f.getName().replace("_solution.json", ""));
+                    }
+                }
+            }
+        }
+
+        LevelAdapter adapter = new LevelAdapter(levelFiles, completedLevels, position -> {
             Intent intent = new Intent(MainActivity.this, GameActivity.class);
             intent.putExtra(GameActivity.EXTRA_LEVEL_INDEX, position);
             startActivity(intent);

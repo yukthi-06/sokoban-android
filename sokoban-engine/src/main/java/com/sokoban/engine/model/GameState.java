@@ -10,11 +10,12 @@ public final class GameState {
     private final Position playerPos;
     private final int movesCount;
     private final int pushesCount;
+    private final String moveSequence;
     private final GameState previousState;
 
     public GameState(String id, String name, String author, int width, int height, 
                      GridCell[][] grid, Position playerPos, int movesCount, int pushesCount, 
-                     GameState previousState) {
+                     String moveSequence, GameState previousState) {
         this.id = id;
         this.name = name;
         this.author = author;
@@ -24,6 +25,7 @@ public final class GameState {
         this.playerPos = playerPos;
         this.movesCount = movesCount;
         this.pushesCount = pushesCount;
+        this.moveSequence = moveSequence != null ? moveSequence : "";
         this.previousState = previousState;
     }
 
@@ -68,6 +70,10 @@ public final class GameState {
 
     public int getPushesCount() {
         return pushesCount;
+    }
+
+    public String getMoveSequence() {
+        return moveSequence;
     }
 
     public GameState getPreviousState() {

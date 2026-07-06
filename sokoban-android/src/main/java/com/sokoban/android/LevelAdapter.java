@@ -13,10 +13,12 @@ import java.util.function.Consumer;
 public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHolder> {
 
     private final List<String> levelFiles;
+    private final java.util.Set<String> completedLevels;
     private final Consumer<Integer> onLevelClick;
 
-    public LevelAdapter(List<String> levelFiles, Consumer<Integer> onLevelClick) {
+    public LevelAdapter(List<String> levelFiles, java.util.Set<String> completedLevels, Consumer<Integer> onLevelClick) {
         this.levelFiles = levelFiles;
+        this.completedLevels = completedLevels;
         this.onLevelClick = onLevelClick;
     }
 
@@ -41,6 +43,12 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHol
         displayName = displayName.replaceFirst("^0+(?!$)", "");
         
         holder.levelNumberText.setText(displayName);
+
+        if (completedLevels != null && completedLevels.contains(displayName)) {
+            holder.tickMarkText.setVisibility(View.VISIBLE);
+        } else {
+            holder.tickMarkText.setVisibility(View.GONE);
+        }
         
         // Attach click listener directly to the card view, since it consumes clicks
         holder.levelCard.setOnClickListener(v -> onLevelClick.accept(position));
@@ -53,11 +61,13 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHol
 
     static class LevelViewHolder extends RecyclerView.ViewHolder {
         TextView levelNumberText;
+        TextView tickMarkText;
         View levelCard;
 
         public LevelViewHolder(@NonNull View itemView) {
             super(itemView);
             levelNumberText = itemView.findViewById(R.id.levelNumberText);
+            tickMarkText = itemView.findViewById(R.id.tickMarkText);
             levelCard = itemView.findViewById(R.id.levelCard);
         }
     }

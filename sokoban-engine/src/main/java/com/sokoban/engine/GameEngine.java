@@ -7,6 +7,16 @@ import com.sokoban.engine.model.Position;
 
 public final class GameEngine {
 
+    private static String getMoveChar(Direction dir, boolean isPush) {
+        switch (dir) {
+            case UP: return isPush ? "U" : "u";
+            case DOWN: return isPush ? "D" : "d";
+            case LEFT: return isPush ? "L" : "l";
+            case RIGHT: return isPush ? "R" : "r";
+            default: return "";
+        }
+    }
+
     public static GameState move(GameState state, Direction dir) {
         Position currentPos = state.getPlayerPos();
         Position targetPos = currentPos.translate(dir);
@@ -36,6 +46,7 @@ public final class GameEngine {
                 targetPos,
                 state.getMovesCount() + 1,
                 state.getPushesCount(),
+                state.getMoveSequence() + getMoveChar(dir, false),
                 state
             );
         }
@@ -71,6 +82,7 @@ public final class GameEngine {
                     targetPos,
                     state.getMovesCount() + 1,
                     state.getPushesCount() + 1,
+                    state.getMoveSequence() + getMoveChar(dir, true),
                     state
                 );
             }
