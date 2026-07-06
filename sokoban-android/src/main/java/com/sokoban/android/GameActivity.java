@@ -66,10 +66,14 @@ public final class GameActivity extends AppCompatActivity {
         @Override
         public void run() {
             if (currentState != null && !GameEngine.isWin(currentState) && !isReplaying) {
-                if (bestMoves < 0 || currentState.getMovesCount() > 0) {
+                if (currentState.getMovesCount() > 0) {
                     long timeTaken = (System.currentTimeMillis() - startTime) / 1000;
                     if (timeText != null) {
                         timeText.setText("Time: " + timeTaken + "s");
+                    }
+                } else if (bestMoves < 0) {
+                    if (timeText != null) {
+                        timeText.setText("Time: 0s");
                     }
                 }
                 timerHandler.postDelayed(this, 1000);
@@ -345,6 +349,8 @@ public final class GameActivity extends AppCompatActivity {
             if (timeText != null) {
                 if (isReplaying && bestTime >= 0) {
                     timeText.setText("Time: " + bestTime + "s");
+                } else if (currentState.getMovesCount() == 0 && bestMoves < 0) {
+                    timeText.setText("Time: 0s");
                 } else {
                     timeText.setText("Time: " + timeTaken + "s");
                 }
