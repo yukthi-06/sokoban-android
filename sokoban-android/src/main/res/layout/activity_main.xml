@@ -9,138 +9,42 @@
     android:padding="16dp"
     tools:context=".MainActivity">
 
-    <!-- Top Header Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/headerCard"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/dashboardTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/card_bg"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/level_label"
-                    android:textColor="@color/text_muted"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"/>
-
-                <Spinner
-                    android:id="@+id/levelSpinner"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:theme="@style/Widget.AppCompat.Spinner"
-                    android:backgroundTint="@color/text_light" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#3E4256"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/movesText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Moves: 0"
-                    android:textAlignment="center"
-                    android:textColor="@color/text_light"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:id="@+id/pushesText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Pushes: 0"
-                    android:textAlignment="center"
-                    android:textColor="@color/text_light"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Custom Canvas View -->
-    <com.sokoban.android.view.GameView
-        android:id="@+id/gameView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:text="@string/app_name"
+        android:textColor="@color/accent"
+        android:textSize="28sp"
+        android:textStyle="bold"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@id/headerCard"
-        app:layout_constraintBottom_toTopOf="@id/controlsLayout"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Bottom Controls Layout -->
-    <LinearLayout
-        android:id="@+id/controlsLayout"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/selectLevelSubtitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
+        android:text="Select Level"
+        android:textColor="@color/text_muted"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/dashboardTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewLevels"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="4"
+        tools:listitem="@layout/item_level"
+        app:layout_constraintTop_toBottomOf="@id/selectLevelSubtitle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnUndo"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:text="@string/undo_btn"
-            android:textColor="@color/accent"
-            app:strokeColor="@color/accent"
-            app:cornerRadius="8dp"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRestart"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:text="@string/restart_btn"
-            app:backgroundTint="@color/accent"
-            app:cornerRadius="8dp"/>
-
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
