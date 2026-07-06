@@ -44,6 +44,8 @@ public final class GameActivity extends AppCompatActivity {
     private static final String SOLUTIONS_DIR = "/sdcard/Vypeensoft/Sokoban/solutions/";
 
     private TextView levelTitleText;
+    private TextView btnPrevLevel;
+    private TextView btnNextLevel;
     private TextView movesText;
     private TextView pushesText;
     private TextView timeText;
@@ -93,6 +95,8 @@ public final class GameActivity extends AppCompatActivity {
         levelFiles = repository.getLevelFiles();
 
         levelTitleText = findViewById(R.id.levelTitleText);
+        btnPrevLevel = findViewById(R.id.btnPrevLevel);
+        btnNextLevel = findViewById(R.id.btnNextLevel);
         movesText = findViewById(R.id.movesText);
         pushesText = findViewById(R.id.pushesText);
         timeText = findViewById(R.id.timeText);
@@ -133,6 +137,20 @@ public final class GameActivity extends AppCompatActivity {
         btnReplay.setOnClickListener(v -> {
             startReplay();
         });
+        
+        btnPrevLevel.setOnClickListener(v -> {
+            if (currentLevelIndex > 0) {
+                currentLevelIndex--;
+                loadLevel(currentLevelIndex);
+            }
+        });
+        
+        btnNextLevel.setOnClickListener(v -> {
+            if (currentLevelIndex < levelFiles.size() - 1) {
+                currentLevelIndex++;
+                loadLevel(currentLevelIndex);
+            }
+        });
     }
 
     private void doUndo() {
@@ -155,6 +173,9 @@ public final class GameActivity extends AppCompatActivity {
     private void loadLevel(int index) {
         stopReplay();
         if (levelFiles == null || levelFiles.isEmpty()) return;
+        
+        btnPrevLevel.setVisibility(index > 0 ? View.VISIBLE : View.INVISIBLE);
+        btnNextLevel.setVisibility(index < levelFiles.size() - 1 ? View.VISIBLE : View.INVISIBLE);
         
         String fileName = levelFiles.get(index);
         
