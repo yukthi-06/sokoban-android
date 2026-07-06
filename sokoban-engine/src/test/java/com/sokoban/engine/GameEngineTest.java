@@ -8,22 +8,19 @@ import org.junit.jupiter.api.Test;
 
 public class GameEngineTest {
 
-    private static final String SAMPLE_LEVEL_XML = 
-        "<SOKOBAN_SOLVER_GRID>\n" +
-        "<Id>9999</Id>\n" +
-        "<Name>Test Level</Name>\n" +
-        "<Author>Test Author</Author>\n" +
-        "<Height>3</Height>\n" +
-        "<Width>5</Width>\n" +
-        "<NbBoxes>1</NbBoxes>\n" +
-        "<GridWithBlankSpaces>\n" +
-        "#####/#@$.#/#   #\n" +
-        "</GridWithBlankSpaces>\n" +
-        "</SOKOBAN_SOLVER_GRID>";
+    private static final String SAMPLE_LEVEL_JSON = 
+        "{\n" +
+        "    \"id\": 9999,\n" +
+        "    \"title\": \"Test Level\",\n" +
+        "    \"author\": \"Test Author\",\n" +
+        "    \"height\": 3,\n" +
+        "    \"width\": 5,\n" +
+        "    \"map\": \"111111234110001\"\n" +
+        "}";
 
     @Test
     public void testParserAndMovement() throws Exception {
-        GameState state = LevelParser.parse(SAMPLE_LEVEL_XML);
+        GameState state = LevelParser.parse(SAMPLE_LEVEL_JSON);
         
         assertEquals("9999", state.getId());
         assertEquals("Test Level", state.getName());

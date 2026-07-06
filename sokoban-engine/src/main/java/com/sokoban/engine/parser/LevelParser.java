@@ -3,84 +3,81 @@ package com.sokoban.engine.parser;
 import com.sokoban.engine.model.GameState;
 import com.sokoban.engine.model.GridCell;
 import com.sokoban.engine.model.Position;
+import org.json.JSONObject;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.Scanner;
 
 public final class LevelParser {
 
-    public static GameState parse(String xmlContent) throws Exception {
-        return parse(new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8)));
-    }
+    public static GameState parse(String jsonContent) throws Exception {
+        JSONObject json = new JSONObject(jsonContent);
 
-    public static GameState parse(InputStream inputStream) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        // Allow parsing HTML-like or self-closing tags smoothly
-        factory.setCoalescing(true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(inputStream);
-        doc.getDocumentElement().normalize();
+        String id = String.valueOf(json.optInt("id", 0));
+        String name = json.optString("title", "");
+        String author = json.optString("author", "");
+        int height = json.optInt("height", 0);
+        int width = json.optInt("width", 0);
+        String gridRaw = json.optString("map", "");
 
-        String id = getElementValue(doc, "Id");
-        String name = getElementValue(doc, "Name");
-        String author = getElementValue(doc, "Author");
-        int height = Integer.parseInt(getElementValue(doc, "Height"));
-        int width = Integer.parseInt(getElementValue(doc, "Width"));
-        String gridRaw = getElementValue(doc, "GridWithBlankSpaces");
-
-        // Parse grid cells
         GridCell[][] grid = new GridCell[height][width];
+        Position playerPos = null;
+
         for (int r = 0; r < height; r++) {
             for (int c = 0; c < width; c++) {
                 grid[r][c] = GridCell.EMPTY;
             }
         }
 
-        // Split raw grid by /
-        String[] lines = gridRaw.split("/");
-        int targetRow = 0;
-        Position playerPos = null;
+        int index = 0;
+        for (int r = 0; r < height; r++) {
+            for (int c = 0; c < width; c++) {
+                if (index < gridRaw.length()) {
+                    char symbol = gridRaw.charAt(index++);
+                    GridCell cell = parseCell(symbol);
+                    grid[r][c] = cell;
 
-        for (String line : lines) {
-            // Skip empty lines (often resulting from leading/trailing slashes)
-            if (line.isEmpty() && targetRow == 0) {
-                continue;
-            }
-            if (targetRow >= height) {
-                break;
-            }
-
-            for (int c = 0; c < line.length() && c < width; c++) {
-                char symbol = line.charAt(c);
-                GridCell cell = GridCell.fromChar(symbol);
-                grid[targetRow][c] = cell;
-
-                if (cell == GridCell.PLAYER || cell == GridCell.PLAYER_ON_GOAL) {
-                    playerPos = new Position(targetRow, c);
+                    if (cell == GridCell.PLAYER || cell == GridCell.PLAYER_ON_GOAL) {
+                        playerPos = new Position(r, c);
+                    }
                 }
             }
-            targetRow++;
         }
 
         if (playerPos == null) {
-            // Default player position if not found (fallback)
             playerPos = new Position(0, 0);
         }
 
         return new GameState(id, name, author, width, height, grid, playerPos, 0, 0, null);
     }
 
-    private static String getElementValue(Document doc, String tagName) {
-        NodeList nodeList = doc.getElementsByTagName(tagName);
-        if (nodeList != null && nodeList.getLength() > 0) {
-            return nodeList.item(0).getTextContent().trim();
+    public static GameState parse(InputStream inputStream) throws Exception {
+        try (Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8.name())) {
+            String content = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+            return parse(content);
         }
-        return "";
+    }
+
+    private static GridCell parseCell(char c) {
+        switch (c) {
+            case '0':
+            case '7':
+                return GridCell.EMPTY;
+            case '1':
+                return GridCell.WALL;
+            case '2':
+                return GridCell.PLAYER;
+            case '3':
+                return GridCell.BOX;
+            case '4':
+                return GridCell.GOAL;
+            case '5':
+                return GridCell.BOX_ON_GOAL;
+            case '6':
+                return GridCell.PLAYER_ON_GOAL;
+            default:
+                return GridCell.EMPTY;
+        }
     }
 }

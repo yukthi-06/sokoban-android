@@ -23,7 +23,7 @@ public final class LevelRepository {
             String[] files = assetManager.list("levels");
             if (files != null) {
                 for (String file : files) {
-                    if (file.endsWith(".xml")) {
+                    if (file.endsWith(".json")) {
                         levels.add(file);
                     }
                 }
