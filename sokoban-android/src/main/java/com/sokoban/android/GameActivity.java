@@ -1,14 +1,22 @@
 package com.sokoban.android;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import com.sokoban.android.controller.AndroidGameController;
 import com.sokoban.android.repository.LevelRepository;
@@ -33,9 +41,17 @@ public final class GameActivity extends AppCompatActivity {
     private static final String SOLUTIONS_DIR = "/sdcard/Vypeensoft/Sokoban/solutions/";
 
     private TextView levelTitleText;
+    private TextView bestStatsText;
     private TextView movesText;
     private TextView pushesText;
     private GameView gameView;
+    private Button btnReplay;
+
+    private boolean isReplaying = false;
+    private boolean isReplayPaused = false;
+    private Handler replayHandler;
+    private String replaySequence;
+    private int replayIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,53 +64,194 @@ public final class GameActivity extends AppCompatActivity {
         levelFiles = repository.getLevelFiles();
 
         levelTitleText = findViewById(R.id.levelTitleText);
+        bestStatsText = findViewById(R.id.bestStatsText);
         movesText = findViewById(R.id.movesText);
         pushesText = findViewById(R.id.pushesText);
         gameView = findViewById(R.id.gameView);
+        btnReplay = findViewById(R.id.btnReplay);
 
         setupControls();
         loadLevel(currentLevelIndex);
     }
 
     private void setupControls() {
-        // Setup Swipe Controls via Controller
         AndroidGameController controller = new AndroidGameController(this, this::handleMove);
         gameView.setOnTouchListener(controller);
 
-        // Setup Buttons
         findViewById(R.id.btnUndo).setOnClickListener(v -> {
-            if (currentState != null) {
-                currentState = GameEngine.undo(currentState);
-                updateUI();
+            if (isReplaying) {
+                promptInterruptReplay(() -> {
+                    stopReplay();
+                    doUndo();
+                });
+            } else {
+                doUndo();
             }
         });
 
         findViewById(R.id.btnRestart).setOnClickListener(v -> {
-            if (currentState != null) {
-                currentState = GameEngine.restart(currentState);
-                startTime = System.currentTimeMillis(); // Reset timer
-                updateUI();
+            if (isReplaying) {
+                promptInterruptReplay(() -> {
+                    stopReplay();
+                    doRestart();
+                });
+            } else {
+                doRestart();
             }
+        });
+
+        btnReplay.setOnClickListener(v -> {
+            startReplay();
         });
     }
 
+    private void doUndo() {
+        if (currentState != null) {
+            currentState = GameEngine.undo(currentState);
+            updateUI();
+        }
+    }
+
+    private void doRestart() {
+        if (currentState != null) {
+            currentState = GameEngine.restart(currentState);
+            startTime = System.currentTimeMillis();
+            updateUI();
+        }
+    }
+
     private void loadLevel(int index) {
+        stopReplay();
         if (levelFiles == null || levelFiles.isEmpty()) return;
         
         String fileName = levelFiles.get(index);
         
-        // Format display name
         currentDisplayName = fileName.replace(".json", "")
                                      .replaceAll("\\s+", "")
                                      .replaceFirst("^0+(?!$)", "");
-        levelTitleText.setText("Level " + currentDisplayName);
+        
+        File solutionFile = new File(SOLUTIONS_DIR, currentDisplayName + "_solution.json");
+        if (solutionFile.exists()) {
+            levelTitleText.setText("Level " + currentDisplayName + " (Solved)");
+            levelTitleText.setTextColor(Color.parseColor("#4CAF50")); // Green
+            try {
+                String content = new String(Files.readAllBytes(Paths.get(solutionFile.getAbsolutePath())));
+                JSONObject json = new JSONObject(content);
+                int moves = json.optInt("moves count", 0);
+                int pushes = json.optInt("pushes count", 0);
+                long time = json.optLong("timetaken", 0);
+                replaySequence = json.optString("sequence of moves", "");
+
+                bestStatsText.setVisibility(View.VISIBLE);
+                bestStatsText.setText(String.format("Best: %d moves, %d pushes, %ds", moves, pushes, time));
+                
+                if (!replaySequence.isEmpty()) {
+                    btnReplay.setVisibility(View.VISIBLE);
+                } else {
+                    btnReplay.setVisibility(View.GONE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                btnReplay.setVisibility(View.GONE);
+                bestStatsText.setVisibility(View.GONE);
+            }
+        } else {
+            levelTitleText.setText("Level " + currentDisplayName);
+            levelTitleText.setTextColor(ContextCompat.getColor(this, R.color.accent));
+            bestStatsText.setVisibility(View.GONE);
+            btnReplay.setVisibility(View.GONE);
+        }
 
         currentState = repository.loadLevel(fileName);
-        startTime = System.currentTimeMillis(); // Start timer
+        startTime = System.currentTimeMillis();
         updateUI();
     }
 
+    private void startReplay() {
+        if (replaySequence == null || replaySequence.isEmpty()) return;
+        isReplaying = true;
+        isReplayPaused = false;
+        currentState = GameEngine.restart(currentState);
+        updateUI();
+        replayIndex = 0;
+        
+        if (replayHandler == null) {
+            replayHandler = new Handler(Looper.getMainLooper());
+        }
+        replayHandler.postDelayed(replayRunnable, 500);
+    }
+
+    private void stopReplay() {
+        isReplaying = false;
+        isReplayPaused = false;
+        if (replayHandler != null) {
+            replayHandler.removeCallbacks(replayRunnable);
+        }
+    }
+
+    private final Runnable replayRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!isReplaying) return;
+            if (isReplayPaused) {
+                replayHandler.postDelayed(this, 500);
+                return;
+            }
+            if (replayIndex < replaySequence.length()) {
+                char c = replaySequence.charAt(replayIndex++);
+                Direction dir = getDirectionFromChar(c);
+                if (dir != null) {
+                    currentState = GameEngine.move(currentState, dir);
+                    updateUI();
+                }
+                replayHandler.postDelayed(this, 500);
+            } else {
+                stopReplay();
+                if (GameEngine.isWin(currentState)) {
+                    showWinDialog();
+                }
+            }
+        }
+    };
+
+    private Direction getDirectionFromChar(char c) {
+        c = Character.toLowerCase(c);
+        if (c == 'u') return Direction.UP;
+        if (c == 'd') return Direction.DOWN;
+        if (c == 'l') return Direction.LEFT;
+        if (c == 'r') return Direction.RIGHT;
+        return null;
+    }
+
+    private void promptInterruptReplay(Runnable onConfirm) {
+        if (isReplayPaused) return; // Already showing dialog
+        isReplayPaused = true;
+        new AlertDialog.Builder(this)
+            .setTitle("Stop Replay?")
+            .setMessage("Do you want to stop the replay and take over?")
+            .setPositiveButton("Yes", (d, w) -> {
+                isReplayPaused = false;
+                onConfirm.run();
+            })
+            .setNegativeButton("No", (d, w) -> {
+                isReplayPaused = false;
+            })
+            .setOnCancelListener(d -> isReplayPaused = false)
+            .show();
+    }
+
     private void handleMove(Direction direction) {
+        if (isReplaying) {
+            promptInterruptReplay(() -> {
+                stopReplay();
+                handleMoveInternal(direction);
+            });
+            return;
+        }
+        handleMoveInternal(direction);
+    }
+
+    private void handleMoveInternal(Direction direction) {
         if (currentState == null || GameEngine.isWin(currentState)) return;
 
         currentState = GameEngine.move(currentState, direction);
@@ -126,6 +283,11 @@ public final class GameActivity extends AppCompatActivity {
             writer.write(json.toString(4));
             writer.flush();
             writer.close();
+            
+            // Reload to update best stats
+            if (!isReplaying) {
+                // Read fresh json for bestStatsText updates if desired, but we can just wait for next load
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,7 +295,6 @@ public final class GameActivity extends AppCompatActivity {
 
     private void updateUI() {
         if (currentState == null) return;
-
         gameView.setGameState(currentState);
         movesText.setText(getString(R.string.moves_label, currentState.getMovesCount()));
         pushesText.setText(getString(R.string.pushes_label, currentState.getPushesCount()));
@@ -151,7 +312,6 @@ public final class GameActivity extends AppCompatActivity {
                 currentLevelIndex++;
                 loadLevel(currentLevelIndex);
             } else {
-                // Completed all levels
                 AlertDialog.Builder finishedBuilder = new AlertDialog.Builder(GameActivity.this);
                 finishedBuilder.setTitle(R.string.congrats);
                 finishedBuilder.setMessage("You have completed all available levels!");

@@ -43,6 +43,18 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/bestStatsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Best: --"
+                android:textAlignment="center"
+                android:textColor="#4CAF50"
+                android:textSize="14sp"
+                android:textStyle="italic"
+                android:visibility="gone"
+                android:layout_marginTop="4dp" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -121,12 +133,25 @@
             app:cornerRadius="8dp"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnReplay"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:text="Replay"
+            android:visibility="gone"
+            app:backgroundTint="#4CAF50"
+            app:cornerRadius="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRestart"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:text="@string/restart_btn"
             app:backgroundTint="@color/accent"
             app:cornerRadius="8dp"/>
