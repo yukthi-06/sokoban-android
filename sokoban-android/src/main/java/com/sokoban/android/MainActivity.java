@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -30,6 +31,19 @@ public final class MainActivity extends AppCompatActivity {
 
         repository = new LevelRepository(this);
         recyclerViewLevels = findViewById(R.id.recyclerViewLevels);
+        
+        findViewById(R.id.btnSettings).setOnClickListener(v -> {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        });
+        
+        findViewById(R.id.btnHelp).setOnClickListener(v -> {
+            Toast.makeText(this, "Help coming soon!", Toast.LENGTH_SHORT).show();
+        });
+        
+        findViewById(R.id.btnAbout).setOnClickListener(v -> {
+            Toast.makeText(this, "About coming soon!", Toast.LENGTH_SHORT).show();
+        });
 
         requestStoragePermission();
     }
@@ -37,6 +51,7 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         boolean hasPermission = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             hasPermission = Environment.isExternalStorageManager();

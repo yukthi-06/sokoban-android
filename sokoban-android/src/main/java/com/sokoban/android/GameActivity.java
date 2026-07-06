@@ -1,5 +1,7 @@
 package com.sokoban.android;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -52,6 +54,7 @@ public final class GameActivity extends AppCompatActivity {
     private Handler replayHandler;
     private String replaySequence;
     private int replayIndex;
+    private int currentReplayInterval = 300;
 
     private int bestMoves = -1;
     private int bestPushes = -1;
@@ -192,6 +195,10 @@ public final class GameActivity extends AppCompatActivity {
 
     private void startReplay() {
         if (replaySequence == null || replaySequence.isEmpty()) return;
+        
+        SharedPreferences prefs = getSharedPreferences("SokobanPrefs", Context.MODE_PRIVATE);
+        currentReplayInterval = prefs.getInt("replay_interval", 300);
+        
         isReplaying = true;
         isReplayPaused = false;
         currentState = GameEngine.restart(currentState);
@@ -201,7 +208,7 @@ public final class GameActivity extends AppCompatActivity {
         if (replayHandler == null) {
             replayHandler = new Handler(Looper.getMainLooper());
         }
-        replayHandler.postDelayed(replayRunnable, 500);
+        replayHandler.postDelayed(replayRunnable, currentReplayInterval);
     }
 
     private void stopReplay() {
@@ -217,7 +224,7 @@ public final class GameActivity extends AppCompatActivity {
         public void run() {
             if (!isReplaying) return;
             if (isReplayPaused) {
-                replayHandler.postDelayed(this, 500);
+                replayHandler.postDelayed(this, currentReplayInterval);
                 return;
             }
             if (replayIndex < replaySequence.length()) {
@@ -227,7 +234,7 @@ public final class GameActivity extends AppCompatActivity {
                     currentState = GameEngine.move(currentState, dir);
                     updateUI();
                 }
-                replayHandler.postDelayed(this, 500);
+                replayHandler.postDelayed(this, currentReplayInterval);
             } else {
                 stopReplay();
             }
