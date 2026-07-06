@@ -1,15 +1,18 @@
 package com.sokoban.android.repository;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import com.sokoban.engine.model.GameState;
 import com.sokoban.engine.parser.LevelParser;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public final class LevelRepository {
+    private static final String LEVELS_DIR = "/sdcard/Vypeensoft/Sokoban/levels/";
     private final Context context;
 
     public LevelRepository(Context context) {
@@ -17,26 +20,25 @@ public final class LevelRepository {
     }
 
     public List<String> getLevelFiles() {
-        AssetManager assetManager = context.getAssets();
         List<String> levels = new ArrayList<>();
-        try {
-            String[] files = assetManager.list("levels");
+        File dir = new File(LEVELS_DIR);
+        if (dir.exists() && dir.isDirectory()) {
+            File[] files = dir.listFiles();
             if (files != null) {
-                for (String file : files) {
-                    if (file.endsWith(".json")) {
-                        levels.add(file);
+                for (File file : files) {
+                    if (file.isFile() && file.getName().endsWith(".json")) {
+                        levels.add(file.getName());
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         Collections.sort(levels);
         return levels;
     }
 
     public GameState loadLevel(String fileName) {
-        try (InputStream is = context.getAssets().open("levels/" + fileName)) {
+        File file = new File(LEVELS_DIR, fileName);
+        try (InputStream is = new FileInputStream(file)) {
             return LevelParser.parse(is);
         } catch (Exception e) {
             e.printStackTrace();

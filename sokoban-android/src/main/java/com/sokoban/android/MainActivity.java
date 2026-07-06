@@ -6,9 +6,18 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.Settings;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import com.sokoban.android.controller.AndroidGameController;
 import com.sokoban.android.repository.LevelRepository;
 import com.sokoban.android.view.GameView;
@@ -35,20 +44,72 @@ public final class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         repository = new LevelRepository(this);
-        levelFiles = repository.getLevelFiles();
 
         levelSpinner = findViewById(R.id.levelSpinner);
         movesText = findViewById(R.id.movesText);
         pushesText = findViewById(R.id.pushesText);
         gameView = findViewById(R.id.gameView);
 
-        setupLevelSpinner();
         setupControls();
+        
+        requestStoragePermission();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                if (levelFiles == null) {
+                    initializeGame();
+                }
+            }
+        }
+    }
+
+    private void requestStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                try {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                    intent.addCategory("android.intent.category.DEFAULT");
+                    intent.setData(Uri.parse(String.format("package:%s", getPackageName())));
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                    startActivity(intent);
+                }
+            } else {
+                initializeGame();
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            } else {
+                initializeGame();
+            }
+        }
+    }
+
+    private void initializeGame() {
+        levelFiles = repository.getLevelFiles();
+        setupLevelSpinner();
         loadLevel(currentLevelIndex);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initializeGame();
+            }
+        }
+    }
+
     private void setupLevelSpinner() {
-        if (levelFiles.isEmpty()) return;
+        if (levelFiles == null || levelFiles.isEmpty()) return;
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
             this, android.R.layout.simple_spinner_item, levelFiles);
@@ -92,7 +153,7 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     private void loadLevel(int index) {
-        if (levelFiles.isEmpty()) return;
+        if (levelFiles == null || levelFiles.isEmpty()) return;
         String fileName = levelFiles.get(index);
         currentState = repository.loadLevel(fileName);
         updateUI();
