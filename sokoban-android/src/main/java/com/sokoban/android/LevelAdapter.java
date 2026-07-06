@@ -34,17 +34,17 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHol
         String fileName = levelFiles.get(position);
         
         // Remove .json extension
-        String displayName = fileName.replace(".json", "");
+        String rawName = fileName.replace(".json", "");
         
         // Remove spaces
-        displayName = displayName.replaceAll("\\s+", "");
+        String displayName = rawName.replaceAll("\\s+", "");
         
         // Remove leading zeroes
         displayName = displayName.replaceFirst("^0+(?!$)", "");
         
         holder.levelNumberText.setText(displayName);
 
-        if (completedLevels != null && completedLevels.contains(displayName)) {
+        if (completedLevels != null && completedLevels.contains(rawName)) {
             holder.tickMarkText.setVisibility(View.VISIBLE);
         } else {
             holder.tickMarkText.setVisibility(View.GONE);

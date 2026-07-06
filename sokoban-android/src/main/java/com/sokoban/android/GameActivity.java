@@ -39,6 +39,7 @@ public final class GameActivity extends AppCompatActivity {
     private GameState currentState;
     private long startTime;
     private String currentDisplayName;
+    private String rawFileName;
     
     private static final String SOLUTIONS_DIR = "/sdcard/Vypeensoft/Sokoban/solutions/";
 
@@ -157,7 +158,8 @@ public final class GameActivity extends AppCompatActivity {
         
         String fileName = levelFiles.get(index);
         
-        currentDisplayName = fileName.replace(".json", "")
+        rawFileName = fileName.replace(".json", "");
+        currentDisplayName = rawFileName
                                      .replaceAll("\\s+", "")
                                      .replaceFirst("^0+(?!$)", "");
         
@@ -165,7 +167,7 @@ public final class GameActivity extends AppCompatActivity {
         bestPushes = -1;
         bestTime = -1;
 
-        File solutionFile = new File(SOLUTIONS_DIR, currentDisplayName + "_solution.json");
+        File solutionFile = new File(SOLUTIONS_DIR, rawFileName + "_solution.json");
         if (solutionFile.exists()) {
             levelTitleText.setText("Level " + currentDisplayName + " (Solved)");
             levelTitleText.setTextColor(Color.parseColor("#4CAF50")); // Green
@@ -295,7 +297,7 @@ public final class GameActivity extends AppCompatActivity {
         updateUI();
 
         if (GameEngine.isWin(currentState)) {
-            saveSolution(currentDisplayName);
+            saveSolution(rawFileName);
             showWinDialog();
         }
     }
