@@ -42,7 +42,8 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHol
         
         holder.levelNumberText.setText(displayName);
         
-        holder.itemView.setOnClickListener(v -> onLevelClick.accept(position));
+        // Attach click listener directly to the card view, since it consumes clicks
+        holder.levelCard.setOnClickListener(v -> onLevelClick.accept(position));
     }
 
     @Override
@@ -52,10 +53,12 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHol
 
     static class LevelViewHolder extends RecyclerView.ViewHolder {
         TextView levelNumberText;
+        View levelCard;
 
         public LevelViewHolder(@NonNull View itemView) {
             super(itemView);
             levelNumberText = itemView.findViewById(R.id.levelNumberText);
+            levelCard = itemView.findViewById(R.id.levelCard);
         }
     }
 }
