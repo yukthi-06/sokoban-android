@@ -3,6 +3,7 @@ package com.sokoban.android;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.CheckBox;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,12 +12,15 @@ public class SettingsActivity extends AppCompatActivity {
 
     public static final String PREFS_NAME = "SokobanPrefs";
     public static final String KEY_REPLAY_INTERVAL = "replay_interval";
+    public static final String KEY_HIDE_DISLIKED = "hide_disliked";
     public static final int DEFAULT_REPLAY_INTERVAL = 300;
 
     private TextView intervalValueText;
     private SeekBar intervalSeekBar;
     private SharedPreferences prefs;
     private int selectedInterval;
+    private CheckBox hideDislikedCheckbox;
+    private boolean hideDisliked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +31,15 @@ public class SettingsActivity extends AppCompatActivity {
         
         intervalValueText = findViewById(R.id.intervalValueText);
         intervalSeekBar = findViewById(R.id.intervalSeekBar);
+        hideDislikedCheckbox = findViewById(R.id.hideDislikedCheckbox);
 
         selectedInterval = prefs.getInt(KEY_REPLAY_INTERVAL, DEFAULT_REPLAY_INTERVAL);
+        hideDisliked = prefs.getBoolean(KEY_HIDE_DISLIKED, false);
+        hideDislikedCheckbox.setChecked(hideDisliked);
+
+        hideDislikedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            hideDisliked = isChecked;
+        });
         
         // SeekBar range: 0-900 maps to 100-1000ms
         intervalSeekBar.setProgress(selectedInterval - 100);
@@ -51,7 +62,10 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnSaveConfig).setOnClickListener(v -> {
-            prefs.edit().putInt(KEY_REPLAY_INTERVAL, selectedInterval).apply();
+            prefs.edit()
+                 .putInt(KEY_REPLAY_INTERVAL, selectedInterval)
+                 .putBoolean(KEY_HIDE_DISLIKED, hideDisliked)
+                 .apply();
             finish();
         });
     }

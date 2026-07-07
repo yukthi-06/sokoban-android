@@ -290,6 +290,9 @@ public final class GameActivity extends AppCompatActivity {
             File f = new File(LIKE_DISLIKE_DIR, rawFileName + ".json");
             JSONObject json = new JSONObject();
             json.put("state", state);
+            if (currentState != null) {
+                json.put("id", currentState.getId());
+            }
             try (FileWriter file = new FileWriter(f)) {
                 file.write(json.toString());
             }

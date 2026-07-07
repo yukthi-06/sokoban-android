@@ -89,6 +89,22 @@
                     android:textSize="12sp"/>
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#3E4256"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"/>
+
+            <CheckBox
+                android:id="@+id/hideDislikedCheckbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hide disliked levels in browsing"
+                android:textColor="@color/text_light"
+                android:buttonTint="@color/accent"
+                android:textSize="16sp"/>
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
