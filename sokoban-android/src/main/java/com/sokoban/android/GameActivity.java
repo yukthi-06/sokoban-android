@@ -310,13 +310,29 @@ public final class GameActivity extends AppCompatActivity {
         return false;
     }
 
+    private boolean isCompleted(int index) {
+        String fileName = levelFiles.get(index);
+        String rawName = fileName.replace(".json", "");
+        File solutionFile = new File(SOLUTIONS_DIR, rawName + "_solution.json");
+        return solutionFile.exists();
+    }
+
     private int findNextValidIndex(int currentIndex) {
         SharedPreferences prefs = getSharedPreferences("SokobanPrefs", Context.MODE_PRIVATE);
         boolean hideDisliked = prefs.getBoolean("hide_disliked", false);
+        boolean showCompleted = prefs.getBoolean("show_completed", true);
         
         int nextIdx = currentIndex + 1;
         while (nextIdx < levelFiles.size()) {
+            boolean shouldSkip = false;
             if (hideDisliked && isDisliked(nextIdx)) {
+                shouldSkip = true;
+            }
+            if (!showCompleted && isCompleted(nextIdx)) {
+                shouldSkip = true;
+            }
+            
+            if (shouldSkip) {
                 nextIdx++;
             } else {
                 return nextIdx;
@@ -328,10 +344,19 @@ public final class GameActivity extends AppCompatActivity {
     private int findPrevValidIndex(int currentIndex) {
         SharedPreferences prefs = getSharedPreferences("SokobanPrefs", Context.MODE_PRIVATE);
         boolean hideDisliked = prefs.getBoolean("hide_disliked", false);
+        boolean showCompleted = prefs.getBoolean("show_completed", true);
         
         int prevIdx = currentIndex - 1;
         while (prevIdx >= 0) {
+            boolean shouldSkip = false;
             if (hideDisliked && isDisliked(prevIdx)) {
+                shouldSkip = true;
+            }
+            if (!showCompleted && isCompleted(prevIdx)) {
+                shouldSkip = true;
+            }
+            
+            if (shouldSkip) {
                 prevIdx--;
             } else {
                 return prevIdx;
