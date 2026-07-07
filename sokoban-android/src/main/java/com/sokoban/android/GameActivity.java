@@ -56,6 +56,7 @@ public final class GameActivity extends AppCompatActivity {
     private TextView btnDislike;
     
     private static final String LIKE_DISLIKE_DIR = "/sdcard/Vypeensoft/Sokoban/like_dislike/";
+    private String currentLikeState = "neutral";
 
     private boolean isReplaying = false;
     private boolean isReplayPaused = false;
@@ -118,8 +119,20 @@ public final class GameActivity extends AppCompatActivity {
         AndroidGameController controller = new AndroidGameController(this, this::handleMove);
         gameView.setOnTouchListener(controller);
 
-        btnLike.setOnClickListener(v -> saveLikeDislike("like"));
-        btnDislike.setOnClickListener(v -> saveLikeDislike("dislike"));
+        btnLike.setOnClickListener(v -> {
+            if ("like".equals(currentLikeState)) {
+                saveLikeDislike("neutral");
+            } else {
+                saveLikeDislike("like");
+            }
+        });
+        btnDislike.setOnClickListener(v -> {
+            if ("dislike".equals(currentLikeState)) {
+                saveLikeDislike("neutral");
+            } else {
+                saveLikeDislike("dislike");
+            }
+        });
 
         btnUndo.setOnClickListener(v -> {
             if (isReplaying) {
@@ -310,6 +323,7 @@ public final class GameActivity extends AppCompatActivity {
     private void loadLikeDislikeState() {
         btnLike.setAlpha(0.5f);
         btnDislike.setAlpha(0.5f);
+        currentLikeState = "neutral";
         File dir = new File(LIKE_DISLIKE_DIR);
         if (!dir.exists()) dir.mkdirs();
         File f = new File(LIKE_DISLIKE_DIR, rawFileName + ".json");
@@ -320,8 +334,10 @@ public final class GameActivity extends AppCompatActivity {
                 String state = json.optString("state", "");
                 if ("like".equals(state)) {
                     btnLike.setAlpha(1.0f);
+                    currentLikeState = "like";
                 } else if ("dislike".equals(state)) {
                     btnDislike.setAlpha(1.0f);
+                    currentLikeState = "dislike";
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -330,12 +346,19 @@ public final class GameActivity extends AppCompatActivity {
     }
 
     private void saveLikeDislike(String state) {
+        currentLikeState = state;
         btnLike.setAlpha("like".equals(state) ? 1.0f : 0.5f);
         btnDislike.setAlpha("dislike".equals(state) ? 1.0f : 0.5f);
         try {
             File dir = new File(LIKE_DISLIKE_DIR);
             if (!dir.exists()) dir.mkdirs();
             File f = new File(LIKE_DISLIKE_DIR, rawFileName + ".json");
+            
+            if ("neutral".equals(state)) {
+                if (f.exists()) f.delete();
+                return;
+            }
+            
             JSONObject json = new JSONObject();
             json.put("state", state);
             if (currentState != null) {
