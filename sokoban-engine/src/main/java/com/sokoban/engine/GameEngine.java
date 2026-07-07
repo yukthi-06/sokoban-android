@@ -5,6 +5,14 @@ import com.vypeensoft.sokoban.engine.model.GameState;
 import com.vypeensoft.sokoban.engine.model.GridCell;
 import com.vypeensoft.sokoban.engine.model.Position;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+
 public final class GameEngine {
 
     private static String getMoveChar(Direction dir, boolean isPush) {
@@ -119,5 +127,54 @@ public final class GameEngine {
             temp = temp.getPreviousState();
         }
         return temp;
+    }
+
+    public static List<Direction> findPath(GameState state, Position target) {
+        Position start = state.getPlayerPos();
+        if (start.equals(target)) return null;
+        
+        GridCell targetCell = state.getCell(target.getRow(), target.getCol());
+        if (targetCell != GridCell.EMPTY && targetCell != GridCell.GOAL) {
+            return null; // Can only walk to empty or goal
+        }
+
+        Queue<Position> queue = new LinkedList<>();
+        Map<Position, Position> cameFrom = new HashMap<>();
+        Map<Position, Direction> moveFrom = new HashMap<>();
+        
+        queue.add(start);
+        cameFrom.put(start, null);
+        
+        while (!queue.isEmpty()) {
+            Position curr = queue.poll();
+            
+            if (curr.equals(target)) {
+                List<Direction> path = new ArrayList<>();
+                Position p = target;
+                while (cameFrom.get(p) != null) {
+                    path.add(moveFrom.get(p));
+                    p = cameFrom.get(p);
+                }
+                Collections.reverse(path);
+                return path;
+            }
+            
+            for (Direction dir : Direction.values()) {
+                Position next = curr.translate(dir);
+                if (next.getRow() >= 0 && next.getRow() < state.getHeight() && 
+                    next.getCol() >= 0 && next.getCol() < state.getWidth()) {
+                    
+                    if (!cameFrom.containsKey(next)) {
+                        GridCell cell = state.getCell(next.getRow(), next.getCol());
+                        if (cell == GridCell.EMPTY || cell == GridCell.GOAL || cell == GridCell.PLAYER || cell == GridCell.PLAYER_ON_GOAL) {
+                            cameFrom.put(next, curr);
+                            moveFrom.put(next, dir);
+                            queue.add(next);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

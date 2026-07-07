@@ -10,6 +10,7 @@ public final class AndroidGameController implements View.OnTouchListener {
 
     public interface OnMoveListener {
         void onMove(Direction direction);
+        void onTap(float x, float y);
     }
 
     private final GestureDetector gestureDetector;
@@ -32,6 +33,12 @@ public final class AndroidGameController implements View.OnTouchListener {
 
         @Override
         public boolean onDown(MotionEvent e) {
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            moveListener.onTap(e.getX(), e.getY());
             return true;
         }
 

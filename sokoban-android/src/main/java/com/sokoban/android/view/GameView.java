@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import com.vypeensoft.sokoban.android.R;
 import com.vypeensoft.sokoban.engine.model.GameState;
 import com.vypeensoft.sokoban.engine.model.GridCell;
+import com.vypeensoft.sokoban.engine.model.Position;
 
 public final class GameView extends View {
 
@@ -59,6 +60,32 @@ public final class GameView extends View {
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
         invalidate();
+    }
+
+    public Position getLogicalPosition(float x, float y) {
+        if (gameState == null || tileSize <= 0) return null;
+
+        int cols = gameState.getWidth();
+        int rows = gameState.getHeight();
+        boolean rotate = cols > rows;
+
+        int drawCols = rotate ? rows : cols;
+        int drawRows = rotate ? cols : rows;
+
+        // Check if outside grid bounds
+        if (x < offsetX || y < offsetY) return null;
+        if (x >= offsetX + drawCols * tileSize || y >= offsetY + drawRows * tileSize) return null;
+
+        int c = (int) ((x - offsetX) / tileSize);
+        int r = (int) ((y - offsetY) / tileSize);
+
+        if (rotate) {
+            int logicalR = rows - 1 - c;
+            int logicalC = r;
+            return new Position(logicalR, logicalC);
+        } else {
+            return new Position(r, c);
+        }
     }
 
     @Override

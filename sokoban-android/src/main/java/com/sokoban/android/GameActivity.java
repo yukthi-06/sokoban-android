@@ -69,6 +69,11 @@ public final class GameActivity extends AppCompatActivity {
     private int bestPushes = -1;
     private long bestTime = -1;
 
+    private boolean isAutoMoving = false;
+    private Handler autoMoveHandler;
+    private List<Direction> autoMovePath;
+    private int autoMoveIndex;
+
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private final Runnable timerRunnable = new Runnable() {
         @Override
@@ -116,7 +121,19 @@ public final class GameActivity extends AppCompatActivity {
     }
 
     private void setupControls() {
-        AndroidGameController controller = new AndroidGameController(this, this::handleMove);
+        AndroidGameController controller = new AndroidGameController(this, new AndroidGameController.OnMoveListener() {
+            @Override
+            public void onMove(Direction direction) {
+                stopAutoMove();
+                handleMove(direction);
+            }
+            @Override
+            public void onTap(float x, float y) {
+                if (!isReplaying) {
+                    handleTap(x, y);
+                }
+            }
+        });
         gameView.setOnTouchListener(controller);
 
         btnLike.setOnClickListener(v -> {
@@ -135,6 +152,7 @@ public final class GameActivity extends AppCompatActivity {
         });
 
         btnUndo.setOnClickListener(v -> {
+            stopAutoMove();
             if (isReplaying) {
                 promptInterruptReplay(() -> {
                     stopReplay();
@@ -146,6 +164,7 @@ public final class GameActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnRestart).setOnClickListener(v -> {
+            stopAutoMove();
             if (isReplaying) {
                 promptInterruptReplay(() -> {
                     stopReplay();
@@ -195,6 +214,7 @@ public final class GameActivity extends AppCompatActivity {
     }
 
     private void loadLevel(int index) {
+        stopAutoMove();
         stopReplay();
         if (levelFiles == null || levelFiles.isEmpty()) return;
         
@@ -420,6 +440,50 @@ public final class GameActivity extends AppCompatActivity {
             .show();
     }
 
+    private void stopAutoMove() {
+        isAutoMoving = false;
+        if (autoMoveHandler != null) {
+            autoMoveHandler.removeCallbacks(autoMoveRunnable);
+        }
+    }
+
+    private void startAutoMove(List<Direction> path) {
+        autoMovePath = path;
+        autoMoveIndex = 0;
+        isAutoMoving = true;
+        if (autoMoveHandler == null) {
+            autoMoveHandler = new Handler(Looper.getMainLooper());
+        }
+        autoMoveHandler.post(autoMoveRunnable);
+    }
+
+    private final Runnable autoMoveRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!isAutoMoving || currentState == null) return;
+            if (autoMoveIndex < autoMovePath.size()) {
+                Direction dir = autoMovePath.get(autoMoveIndex++);
+                handleMoveInternal(dir);
+                if (isAutoMoving) {
+                    autoMoveHandler.postDelayed(this, 50);
+                }
+            } else {
+                stopAutoMove();
+            }
+        }
+    };
+
+    private void handleTap(float x, float y) {
+        if (currentState == null || GameEngine.isWin(currentState)) return;
+        com.vypeensoft.sokoban.engine.model.Position target = gameView.getLogicalPosition(x, y);
+        if (target != null) {
+            List<Direction> path = GameEngine.findPath(currentState, target);
+            if (path != null && !path.isEmpty()) {
+                startAutoMove(path);
+            }
+        }
+    }
+
     private Direction getMappedDirection(Direction visualDir) {
         if (currentState != null && currentState.getWidth() > currentState.getHeight()) {
             switch (visualDir) {
@@ -611,6 +675,7 @@ public final class GameActivity extends AppCompatActivity {
         }
 
         if (dir != null) {
+            stopAutoMove();
             handleMove(dir);
             return true;
         }
