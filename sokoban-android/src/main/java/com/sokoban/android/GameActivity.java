@@ -518,21 +518,61 @@ public final class GameActivity extends AppCompatActivity {
             currentState.getMovesCount(), currentState.getPushesCount()));
 
         builder.setCancelable(false);
-        builder.setPositiveButton(R.string.next_level_btn, (dialog, which) -> {
-            if (currentLevelIndex + 1 < levelFiles.size()) {
-                currentLevelIndex++;
+        builder.setPositiveButton(R.string.next_level_btn, (dialogInterface, which) -> {
+            int nextIdx = findNextValidIndex(currentLevelIndex);
+            if (nextIdx != -1) {
+                currentLevelIndex = nextIdx;
                 loadLevel(currentLevelIndex);
             } else {
                 AlertDialog.Builder finishedBuilder = new AlertDialog.Builder(GameActivity.this);
                 finishedBuilder.setTitle(R.string.congrats);
                 finishedBuilder.setMessage("You have completed all available levels!");
                 finishedBuilder.setPositiveButton("OK", (d, w) -> finish());
-                finishedBuilder.show();
+                AlertDialog finishedDialog = finishedBuilder.create();
+                finishedDialog.show();
+                styleDialogButtons(finishedDialog);
             }
         });
 
-        builder.setNegativeButton("Close", (dialog, which) -> finish());
-        builder.show();
+        builder.setNegativeButton("Close", (dialogInterface, which) -> finish());
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        styleDialogButtons(dialog);
+    }
+
+    private void styleDialogButtons(AlertDialog dialog) {
+        android.widget.Button positiveBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        android.widget.Button negativeBtn = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        if (positiveBtn != null) {
+            positiveBtn.setTextColor(Color.WHITE);
+            android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
+            gd.setColor(Color.TRANSPARENT);
+            gd.setCornerRadius(16);
+            gd.setStroke(3, Color.WHITE);
+            positiveBtn.setBackground(gd);
+            
+            android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) positiveBtn.getLayoutParams();
+            if (params != null) {
+                params.setMargins(16, 0, 16, 0);
+                positiveBtn.setLayoutParams(params);
+            }
+        }
+        
+        if (negativeBtn != null) {
+            negativeBtn.setTextColor(Color.WHITE);
+            android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
+            gd.setColor(Color.TRANSPARENT);
+            gd.setCornerRadius(16);
+            gd.setStroke(3, Color.WHITE);
+            negativeBtn.setBackground(gd);
+            
+            android.widget.LinearLayout.LayoutParams params = (android.widget.LinearLayout.LayoutParams) negativeBtn.getLayoutParams();
+            if (params != null) {
+                params.setMargins(16, 0, 16, 0);
+                negativeBtn.setLayoutParams(params);
+            }
+        }
     }
 
     @Override
