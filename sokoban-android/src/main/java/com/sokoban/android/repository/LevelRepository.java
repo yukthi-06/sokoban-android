@@ -20,7 +20,6 @@ public final class LevelRepository {
     }
 
     public List<String> getLevelFiles() {
-        boolean hideDisliked = context.getSharedPreferences("SokobanPrefs", Context.MODE_PRIVATE).getBoolean("hide_disliked", false);
         List<String> levels = new ArrayList<>();
         File dir = new File(LEVELS_DIR);
         if (dir.exists() && dir.isDirectory()) {
@@ -28,21 +27,6 @@ public final class LevelRepository {
             if (files != null) {
                 for (File file : files) {
                     if (file.isFile() && file.getName().endsWith(".json")) {
-                        if (hideDisliked) {
-                            String rawFileName = file.getName().replace(".json", "");
-                            File likeDislikeFile = new File("/sdcard/Vypeensoft/Sokoban/like_dislike/", rawFileName + ".json");
-                            if (likeDislikeFile.exists()) {
-                                try {
-                                    String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(likeDislikeFile.getAbsolutePath())));
-                                    org.json.JSONObject json = new org.json.JSONObject(content);
-                                    if ("dislike".equals(json.optString("state", ""))) {
-                                        continue; // skip this file
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
                         levels.add(file.getName());
                     }
                 }

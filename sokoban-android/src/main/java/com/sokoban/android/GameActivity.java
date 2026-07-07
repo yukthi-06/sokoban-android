@@ -148,15 +148,17 @@ public final class GameActivity extends AppCompatActivity {
         });
         
         btnPrevLevel.setOnClickListener(v -> {
-            if (currentLevelIndex > 0) {
-                currentLevelIndex--;
+            int prevIdx = findPrevValidIndex(currentLevelIndex);
+            if (prevIdx != -1) {
+                currentLevelIndex = prevIdx;
                 loadLevel(currentLevelIndex);
             }
         });
         
         btnNextLevel.setOnClickListener(v -> {
-            if (currentLevelIndex < levelFiles.size() - 1) {
-                currentLevelIndex++;
+            int nextIdx = findNextValidIndex(currentLevelIndex);
+            if (nextIdx != -1) {
+                currentLevelIndex = nextIdx;
                 loadLevel(currentLevelIndex);
             }
         });
@@ -183,8 +185,8 @@ public final class GameActivity extends AppCompatActivity {
         stopReplay();
         if (levelFiles == null || levelFiles.isEmpty()) return;
         
-        btnPrevLevel.setVisibility(index > 0 ? View.VISIBLE : View.INVISIBLE);
-        btnNextLevel.setVisibility(index < levelFiles.size() - 1 ? View.VISIBLE : View.INVISIBLE);
+        btnPrevLevel.setVisibility(findPrevValidIndex(index) != -1 ? View.VISIBLE : View.INVISIBLE);
+        btnNextLevel.setVisibility(findNextValidIndex(index) != -1 ? View.VISIBLE : View.INVISIBLE);
         
         String fileName = levelFiles.get(index);
         
@@ -257,6 +259,52 @@ public final class GameActivity extends AppCompatActivity {
         if (replayHandler != null) {
             replayHandler.removeCallbacks(replayRunnable);
         }
+    }
+
+    private boolean isDisliked(int index) {
+        String fileName = levelFiles.get(index);
+        String rawName = fileName.replace(".json", "");
+        File likeDislikeFile = new File(LIKE_DISLIKE_DIR, rawName + ".json");
+        if (likeDislikeFile.exists()) {
+            try {
+                String content = new String(Files.readAllBytes(Paths.get(likeDislikeFile.getAbsolutePath())));
+                JSONObject json = new JSONObject(content);
+                return "dislike".equals(json.optString("state", ""));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    private int findNextValidIndex(int currentIndex) {
+        SharedPreferences prefs = getSharedPreferences("SokobanPrefs", Context.MODE_PRIVATE);
+        boolean hideDisliked = prefs.getBoolean("hide_disliked", false);
+        
+        int nextIdx = currentIndex + 1;
+        while (nextIdx < levelFiles.size()) {
+            if (hideDisliked && isDisliked(nextIdx)) {
+                nextIdx++;
+            } else {
+                return nextIdx;
+            }
+        }
+        return -1;
+    }
+
+    private int findPrevValidIndex(int currentIndex) {
+        SharedPreferences prefs = getSharedPreferences("SokobanPrefs", Context.MODE_PRIVATE);
+        boolean hideDisliked = prefs.getBoolean("hide_disliked", false);
+        
+        int prevIdx = currentIndex - 1;
+        while (prevIdx >= 0) {
+            if (hideDisliked && isDisliked(prevIdx)) {
+                prevIdx--;
+            } else {
+                return prevIdx;
+            }
+        }
+        return -1;
     }
 
     private void loadLikeDislikeState() {
