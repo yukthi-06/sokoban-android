@@ -127,6 +127,9 @@ public final class MainActivity extends AppCompatActivity {
                 if (json.has("hide_disliked")) {
                     editor.putBoolean("hide_disliked", json.getBoolean("hide_disliked"));
                 }
+                if (json.has("show_completed")) {
+                    editor.putBoolean("show_completed", json.getBoolean("show_completed"));
+                }
                 editor.apply();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -152,9 +155,26 @@ public final class MainActivity extends AppCompatActivity {
             }
         }
 
-        LevelAdapter adapter = new LevelAdapter(levelFiles, completedLevels, position -> {
+        android.content.SharedPreferences prefs = getSharedPreferences("SokobanPrefs", android.content.Context.MODE_PRIVATE);
+        boolean showCompleted = prefs.getBoolean("show_completed", true);
+
+        java.util.List<String> displayFiles = new java.util.ArrayList<>();
+        java.util.List<Integer> displayIndices = new java.util.ArrayList<>();
+        
+        for (int i = 0; i < levelFiles.size(); i++) {
+            String f = levelFiles.get(i);
+            String rawName = f.replace(".json", "");
+            if (!showCompleted && completedLevels.contains(rawName)) {
+                continue;
+            }
+            displayFiles.add(f);
+            displayIndices.add(i);
+        }
+
+        LevelAdapter adapter = new LevelAdapter(displayFiles, completedLevels, position -> {
+            int originalIndex = displayIndices.get(position);
             Intent intent = new Intent(MainActivity.this, GameActivity.class);
-            intent.putExtra(GameActivity.EXTRA_LEVEL_INDEX, position);
+            intent.putExtra(GameActivity.EXTRA_LEVEL_INDEX, originalIndex);
             startActivity(intent);
         });
         

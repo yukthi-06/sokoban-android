@@ -13,6 +13,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String PREFS_NAME = "SokobanPrefs";
     public static final String KEY_REPLAY_INTERVAL = "replay_interval";
     public static final String KEY_HIDE_DISLIKED = "hide_disliked";
+    public static final String KEY_SHOW_COMPLETED = "show_completed";
     public static final int DEFAULT_REPLAY_INTERVAL = 300;
 
     private TextView intervalValueText;
@@ -21,6 +22,8 @@ public class SettingsActivity extends AppCompatActivity {
     private int selectedInterval;
     private CheckBox hideDislikedCheckbox;
     private boolean hideDisliked;
+    private CheckBox showCompletedCheckbox;
+    private boolean showCompleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,13 +35,21 @@ public class SettingsActivity extends AppCompatActivity {
         intervalValueText = findViewById(R.id.intervalValueText);
         intervalSeekBar = findViewById(R.id.intervalSeekBar);
         hideDislikedCheckbox = findViewById(R.id.hideDislikedCheckbox);
+        showCompletedCheckbox = findViewById(R.id.showCompletedCheckbox);
 
         selectedInterval = prefs.getInt(KEY_REPLAY_INTERVAL, DEFAULT_REPLAY_INTERVAL);
         hideDisliked = prefs.getBoolean(KEY_HIDE_DISLIKED, false);
         hideDislikedCheckbox.setChecked(hideDisliked);
+        
+        showCompleted = prefs.getBoolean(KEY_SHOW_COMPLETED, true);
+        showCompletedCheckbox.setChecked(showCompleted);
 
         hideDislikedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             hideDisliked = isChecked;
+        });
+        
+        showCompletedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            showCompleted = isChecked;
         });
         
         // SeekBar range: 0-900 maps to 100-1000ms
@@ -65,6 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
             prefs.edit()
                  .putInt(KEY_REPLAY_INTERVAL, selectedInterval)
                  .putBoolean(KEY_HIDE_DISLIKED, hideDisliked)
+                 .putBoolean(KEY_SHOW_COMPLETED, showCompleted)
                  .apply();
                  
             try {
@@ -74,6 +86,7 @@ public class SettingsActivity extends AppCompatActivity {
                 org.json.JSONObject json = new org.json.JSONObject();
                 json.put("replay_interval", selectedInterval);
                 json.put("hide_disliked", hideDisliked);
+                json.put("show_completed", showCompleted);
                 try (java.io.FileWriter file = new java.io.FileWriter(f)) {
                     file.write(json.toString(4));
                 }
