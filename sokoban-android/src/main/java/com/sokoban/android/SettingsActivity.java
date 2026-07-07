@@ -12,7 +12,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public static final String PREFS_NAME = "SokobanPrefs";
     public static final String KEY_REPLAY_INTERVAL = "replay_interval";
-    public static final String KEY_HIDE_DISLIKED = "hide_disliked";
+    public static final String KEY_SHOW_DISLIKED = "show_disliked";
     public static final String KEY_SHOW_COMPLETED = "show_completed";
     public static final int DEFAULT_REPLAY_INTERVAL = 300;
 
@@ -20,8 +20,8 @@ public class SettingsActivity extends AppCompatActivity {
     private SeekBar intervalSeekBar;
     private SharedPreferences prefs;
     private int selectedInterval;
-    private CheckBox hideDislikedCheckbox;
-    private boolean hideDisliked;
+    private CheckBox showDislikedCheckbox;
+    private boolean showDisliked;
     private CheckBox showCompletedCheckbox;
     private boolean showCompleted;
 
@@ -34,18 +34,18 @@ public class SettingsActivity extends AppCompatActivity {
         
         intervalValueText = findViewById(R.id.intervalValueText);
         intervalSeekBar = findViewById(R.id.intervalSeekBar);
-        hideDislikedCheckbox = findViewById(R.id.hideDislikedCheckbox);
+        showDislikedCheckbox = findViewById(R.id.showDislikedCheckbox);
         showCompletedCheckbox = findViewById(R.id.showCompletedCheckbox);
 
         selectedInterval = prefs.getInt(KEY_REPLAY_INTERVAL, DEFAULT_REPLAY_INTERVAL);
-        hideDisliked = prefs.getBoolean(KEY_HIDE_DISLIKED, false);
-        hideDislikedCheckbox.setChecked(hideDisliked);
+        showDisliked = prefs.getBoolean(KEY_SHOW_DISLIKED, true);
+        showDislikedCheckbox.setChecked(showDisliked);
         
         showCompleted = prefs.getBoolean(KEY_SHOW_COMPLETED, true);
         showCompletedCheckbox.setChecked(showCompleted);
 
-        hideDislikedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            hideDisliked = isChecked;
+        showDislikedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            showDisliked = isChecked;
         });
         
         showCompletedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -75,7 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.btnSaveConfig).setOnClickListener(v -> {
             prefs.edit()
                  .putInt(KEY_REPLAY_INTERVAL, selectedInterval)
-                 .putBoolean(KEY_HIDE_DISLIKED, hideDisliked)
+                 .putBoolean(KEY_SHOW_DISLIKED, showDisliked)
                  .putBoolean(KEY_SHOW_COMPLETED, showCompleted)
                  .apply();
                  
@@ -85,7 +85,7 @@ public class SettingsActivity extends AppCompatActivity {
                 java.io.File f = new java.io.File(dir, "settings.json");
                 org.json.JSONObject json = new org.json.JSONObject();
                 json.put("replay_interval", selectedInterval);
-                json.put("hide_disliked", hideDisliked);
+                json.put("show_disliked", showDisliked);
                 json.put("show_completed", showCompleted);
                 try (java.io.FileWriter file = new java.io.FileWriter(f)) {
                     file.write(json.toString(4));

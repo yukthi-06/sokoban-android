@@ -319,13 +319,13 @@ public final class GameActivity extends AppCompatActivity {
 
     private int findNextValidIndex(int currentIndex) {
         SharedPreferences prefs = getSharedPreferences("SokobanPrefs", Context.MODE_PRIVATE);
-        boolean hideDisliked = prefs.getBoolean("hide_disliked", false);
+        boolean showDisliked = prefs.getBoolean("show_disliked", true);
         boolean showCompleted = prefs.getBoolean("show_completed", true);
         
         int nextIdx = currentIndex + 1;
         while (nextIdx < levelFiles.size()) {
             boolean shouldSkip = false;
-            if (hideDisliked && isDisliked(nextIdx)) {
+            if (!showDisliked && isDisliked(nextIdx)) {
                 shouldSkip = true;
             }
             if (!showCompleted && isCompleted(nextIdx)) {
@@ -343,13 +343,13 @@ public final class GameActivity extends AppCompatActivity {
 
     private int findPrevValidIndex(int currentIndex) {
         SharedPreferences prefs = getSharedPreferences("SokobanPrefs", Context.MODE_PRIVATE);
-        boolean hideDisliked = prefs.getBoolean("hide_disliked", false);
+        boolean showDisliked = prefs.getBoolean("show_disliked", true);
         boolean showCompleted = prefs.getBoolean("show_completed", true);
         
         int prevIdx = currentIndex - 1;
         while (prevIdx >= 0) {
             boolean shouldSkip = false;
-            if (hideDisliked && isDisliked(prevIdx)) {
+            if (!showDisliked && isDisliked(prevIdx)) {
                 shouldSkip = true;
             }
             if (!showCompleted && isCompleted(prevIdx)) {

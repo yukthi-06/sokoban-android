@@ -124,8 +124,8 @@ public final class MainActivity extends AppCompatActivity {
                 if (json.has("replay_interval")) {
                     editor.putInt("replay_interval", json.getInt("replay_interval"));
                 }
-                if (json.has("hide_disliked")) {
-                    editor.putBoolean("hide_disliked", json.getBoolean("hide_disliked"));
+                if (json.has("show_disliked")) {
+                    editor.putBoolean("show_disliked", json.getBoolean("show_disliked"));
                 }
                 if (json.has("show_completed")) {
                     editor.putBoolean("show_completed", json.getBoolean("show_completed"));
