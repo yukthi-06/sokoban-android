@@ -52,6 +52,10 @@ public final class GameActivity extends AppCompatActivity {
     private GameView gameView;
     private Button btnReplay;
     private Button btnUndo;
+    private TextView btnLike;
+    private TextView btnDislike;
+    
+    private static final String LIKE_DISLIKE_DIR = "/sdcard/Vypeensoft/Sokoban/like_dislike/";
 
     private boolean isReplaying = false;
     private boolean isReplayPaused = false;
@@ -103,6 +107,8 @@ public final class GameActivity extends AppCompatActivity {
         gameView = findViewById(R.id.gameView);
         btnReplay = findViewById(R.id.btnReplay);
         btnUndo = findViewById(R.id.btnUndo);
+        btnLike = findViewById(R.id.btnLike);
+        btnDislike = findViewById(R.id.btnDislike);
 
         setupControls();
         loadLevel(currentLevelIndex);
@@ -111,6 +117,9 @@ public final class GameActivity extends AppCompatActivity {
     private void setupControls() {
         AndroidGameController controller = new AndroidGameController(this, this::handleMove);
         gameView.setOnTouchListener(controller);
+
+        btnLike.setOnClickListener(v -> saveLikeDislike("like"));
+        btnDislike.setOnClickListener(v -> saveLikeDislike("dislike"));
 
         btnUndo.setOnClickListener(v -> {
             if (isReplaying) {
@@ -184,6 +193,8 @@ public final class GameActivity extends AppCompatActivity {
                                      .replaceAll("\\s+", "")
                                      .replaceFirst("^0+(?!$)", "");
         
+        loadLikeDislikeState();
+        
         bestMoves = -1;
         bestPushes = -1;
         bestTime = -1;
@@ -245,6 +256,45 @@ public final class GameActivity extends AppCompatActivity {
         isReplayPaused = false;
         if (replayHandler != null) {
             replayHandler.removeCallbacks(replayRunnable);
+        }
+    }
+
+    private void loadLikeDislikeState() {
+        btnLike.setAlpha(0.5f);
+        btnDislike.setAlpha(0.5f);
+        File dir = new File(LIKE_DISLIKE_DIR);
+        if (!dir.exists()) dir.mkdirs();
+        File f = new File(LIKE_DISLIKE_DIR, rawFileName + ".json");
+        if (f.exists()) {
+            try {
+                String content = new String(Files.readAllBytes(Paths.get(f.getAbsolutePath())));
+                JSONObject json = new JSONObject(content);
+                String state = json.optString("state", "");
+                if ("like".equals(state)) {
+                    btnLike.setAlpha(1.0f);
+                } else if ("dislike".equals(state)) {
+                    btnDislike.setAlpha(1.0f);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void saveLikeDislike(String state) {
+        btnLike.setAlpha("like".equals(state) ? 1.0f : 0.5f);
+        btnDislike.setAlpha("dislike".equals(state) ? 1.0f : 0.5f);
+        try {
+            File dir = new File(LIKE_DISLIKE_DIR);
+            if (!dir.exists()) dir.mkdirs();
+            File f = new File(LIKE_DISLIKE_DIR, rawFileName + ".json");
+            JSONObject json = new JSONObject();
+            json.put("state", state);
+            try (FileWriter file = new FileWriter(f)) {
+                file.write(json.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
