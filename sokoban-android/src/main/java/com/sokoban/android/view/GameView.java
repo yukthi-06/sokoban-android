@@ -72,21 +72,28 @@ public final class GameView extends View {
         float viewWidth = getWidth();
         float viewHeight = getHeight();
 
+        boolean rotate = cols > rows;
+        int drawCols = rotate ? rows : cols;
+        int drawRows = rotate ? cols : rows;
+
         // Calculate tile size to fit layout perfectly
-        float scaleX = viewWidth / cols;
-        float scaleY = viewHeight / rows;
+        float scaleX = viewWidth / drawCols;
+        float scaleY = viewHeight / drawRows;
         tileSize = Math.min(scaleX, scaleY);
 
         // Center the grid on the view
-        offsetX = (viewWidth - (cols * tileSize)) / 2f;
-        offsetY = (viewHeight - (rows * tileSize)) / 2f;
+        offsetX = (viewWidth - (drawCols * tileSize)) / 2f;
+        offsetY = (viewHeight - (drawRows * tileSize)) / 2f;
 
         RectF rect = new RectF();
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                float left = offsetX + c * tileSize;
-                float top = offsetY + r * tileSize;
+                int drawR = rotate ? c : r;
+                int drawC = rotate ? (rows - 1 - r) : c;
+
+                float left = offsetX + drawC * tileSize;
+                float top = offsetY + drawR * tileSize;
                 float right = left + tileSize;
                 float bottom = top + tileSize;
                 rect.set(left, top, right, bottom);

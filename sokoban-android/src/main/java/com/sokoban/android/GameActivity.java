@@ -420,15 +420,28 @@ public final class GameActivity extends AppCompatActivity {
             .show();
     }
 
+    private Direction getMappedDirection(Direction visualDir) {
+        if (currentState != null && currentState.getWidth() > currentState.getHeight()) {
+            switch (visualDir) {
+                case UP: return Direction.LEFT;
+                case DOWN: return Direction.RIGHT;
+                case LEFT: return Direction.DOWN;
+                case RIGHT: return Direction.UP;
+            }
+        }
+        return visualDir;
+    }
+
     private void handleMove(Direction direction) {
+        Direction logicalDir = getMappedDirection(direction);
         if (isReplaying) {
             promptInterruptReplay(() -> {
                 stopReplay();
-                handleMoveInternal(direction);
+                handleMoveInternal(logicalDir);
             });
             return;
         }
-        handleMoveInternal(direction);
+        handleMoveInternal(logicalDir);
     }
 
     private void handleMoveInternal(Direction direction) {
