@@ -67,22 +67,36 @@ public final class MainActivity extends AppCompatActivity {
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
-                try {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                    intent.addCategory("android.intent.category.DEFAULT");
-                    intent.setData(Uri.parse(String.format("package:%s", getPackageName())));
-                    startActivity(intent);
-                } catch (Exception e) {
-                    Intent intent = new Intent();
-                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                    startActivity(intent);
-                }
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Permission Required")
+                    .setMessage("This app requires file access permission to read levels and save settings. Please grant 'All files access' in the next screen.")
+                    .setPositiveButton("OK", (dialog, which) -> {
+                        try {
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                            intent.addCategory("android.intent.category.DEFAULT");
+                            intent.setData(Uri.parse(String.format("package:%s", getPackageName())));
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                            startActivity(intent);
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
             } else {
                 initializeDashboard();
             }
         } else {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Permission Required")
+                    .setMessage("This app requires file access permission to read levels and save settings.")
+                    .setPositiveButton("OK", (dialog, which) -> {
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    })
+                    .setCancelable(false)
+                    .show();
             } else {
                 initializeDashboard();
             }
@@ -99,7 +113,29 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void loadSettingsFromJson() {
+        java.io.File file = new java.io.File("/sdcard/Vypeensoft/Sokoban/settings/settings.json");
+        if (file.exists()) {
+            try {
+                String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(file.getAbsolutePath())));
+                org.json.JSONObject json = new org.json.JSONObject(content);
+                android.content.SharedPreferences prefs = getSharedPreferences("SokobanPrefs", android.content.Context.MODE_PRIVATE);
+                android.content.SharedPreferences.Editor editor = prefs.edit();
+                if (json.has("replay_interval")) {
+                    editor.putInt("replay_interval", json.getInt("replay_interval"));
+                }
+                if (json.has("hide_disliked")) {
+                    editor.putBoolean("hide_disliked", json.getBoolean("hide_disliked"));
+                }
+                editor.apply();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void initializeDashboard() {
+        loadSettingsFromJson();
         levelFiles = repository.getLevelFiles();
         if (levelFiles == null || levelFiles.isEmpty()) return;
 

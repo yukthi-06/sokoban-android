@@ -66,6 +66,21 @@ public class SettingsActivity extends AppCompatActivity {
                  .putInt(KEY_REPLAY_INTERVAL, selectedInterval)
                  .putBoolean(KEY_HIDE_DISLIKED, hideDisliked)
                  .apply();
+                 
+            try {
+                java.io.File dir = new java.io.File("/sdcard/Vypeensoft/Sokoban/settings");
+                if (!dir.exists()) dir.mkdirs();
+                java.io.File f = new java.io.File(dir, "settings.json");
+                org.json.JSONObject json = new org.json.JSONObject();
+                json.put("replay_interval", selectedInterval);
+                json.put("hide_disliked", hideDisliked);
+                try (java.io.FileWriter file = new java.io.FileWriter(f)) {
+                    file.write(json.toString(4));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
             finish();
         });
     }
