@@ -1,9 +1,9 @@
-package com.sokoban.engine;
+package com.vypeensoft.sokoban.engine;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.sokoban.engine.model.*;
-import com.sokoban.engine.parser.LevelParser;
+import com.vypeensoft.sokoban.engine.model.*;
+import com.vypeensoft.sokoban.engine.parser.LevelParser;
 import org.junit.jupiter.api.Test;
 
 public class GameEngineTest {

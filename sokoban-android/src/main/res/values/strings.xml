@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Sokoban Offline</string>
+    <string name="app_name">Sokoban</string>
     <string name="level_label">Level:</string>
     <string name="moves_label">Moves: %1$d</string>
     <string name="pushes_label">Pushes: %1$d</string>

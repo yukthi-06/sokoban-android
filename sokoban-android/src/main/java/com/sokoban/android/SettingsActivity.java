@@ -1,4 +1,4 @@
-package com.sokoban.android;
+package com.vypeensoft.sokoban.android;
 
 import android.content.Context;
 import android.content.SharedPreferences;

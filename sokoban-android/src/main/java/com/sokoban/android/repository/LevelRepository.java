@@ -1,8 +1,8 @@
-package com.sokoban.android.repository;
+package com.vypeensoft.sokoban.android.repository;
 
 import android.content.Context;
-import com.sokoban.engine.model.GameState;
-import com.sokoban.engine.parser.LevelParser;
+import com.vypeensoft.sokoban.engine.model.GameState;
+import com.vypeensoft.sokoban.engine.parser.LevelParser;
 
 import java.io.File;
 import java.io.FileInputStream;

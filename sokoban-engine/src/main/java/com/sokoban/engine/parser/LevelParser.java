@@ -1,8 +1,8 @@
-package com.sokoban.engine.parser;
+package com.vypeensoft.sokoban.engine.parser;
 
-import com.sokoban.engine.model.GameState;
-import com.sokoban.engine.model.GridCell;
-import com.sokoban.engine.model.Position;
+import com.vypeensoft.sokoban.engine.model.GameState;
+import com.vypeensoft.sokoban.engine.model.GridCell;
+import com.vypeensoft.sokoban.engine.model.Position;
 import org.json.JSONObject;
 
 import java.io.InputStream;

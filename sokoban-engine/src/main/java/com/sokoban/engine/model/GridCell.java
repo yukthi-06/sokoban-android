@@ -1,4 +1,4 @@
-package com.sokoban.engine.model;
+package com.vypeensoft.sokoban.engine.model;
 
 public enum GridCell {
     WALL('#'),

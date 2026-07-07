@@ -1,4 +1,4 @@
-package com.sokoban.android;
+package com.vypeensoft.sokoban.android;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,12 +20,12 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import com.sokoban.android.controller.AndroidGameController;
-import com.sokoban.android.repository.LevelRepository;
-import com.sokoban.android.view.GameView;
-import com.sokoban.engine.GameEngine;
-import com.sokoban.engine.model.Direction;
-import com.sokoban.engine.model.GameState;
+import com.vypeensoft.sokoban.android.controller.AndroidGameController;
+import com.vypeensoft.sokoban.android.repository.LevelRepository;
+import com.vypeensoft.sokoban.android.view.GameView;
+import com.vypeensoft.sokoban.engine.GameEngine;
+import com.vypeensoft.sokoban.engine.model.Direction;
+import com.vypeensoft.sokoban.engine.model.GameState;
 
 import java.util.List;
 

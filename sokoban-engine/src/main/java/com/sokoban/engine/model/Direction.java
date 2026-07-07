@@ -1,4 +1,4 @@
-package com.sokoban.engine.model;
+package com.vypeensoft.sokoban.engine.model;
 
 public enum Direction {
     UP(-1, 0),

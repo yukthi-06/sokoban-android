@@ -1,4 +1,4 @@
-package com.sokoban.android.view;
+package com.vypeensoft.sokoban.android.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,9 +9,9 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 import androidx.annotation.Nullable;
-import com.sokoban.android.R;
-import com.sokoban.engine.model.GameState;
-import com.sokoban.engine.model.GridCell;
+import com.vypeensoft.sokoban.android.R;
+import com.vypeensoft.sokoban.engine.model.GameState;
+import com.vypeensoft.sokoban.engine.model.GridCell;
 
 public final class GameView extends View {
 

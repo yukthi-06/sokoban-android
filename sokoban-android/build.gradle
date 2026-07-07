@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.sokoban.android'
+    namespace 'com.vypeensoft.sokoban.android'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.sokoban.android"
+        applicationId "com.vypeensoft.sokoban.android"
         minSdk 24
         targetSdk 34
         versionCode 1

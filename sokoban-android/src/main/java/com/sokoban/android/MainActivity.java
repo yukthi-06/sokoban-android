@@ -1,4 +1,4 @@
-package com.sokoban.android;
+package com.vypeensoft.sokoban.android;
 
 import android.Manifest;
 import android.content.Intent;
@@ -14,7 +14,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.sokoban.android.repository.LevelRepository;
+import com.vypeensoft.sokoban.android.repository.LevelRepository;
 
 import java.util.List;
 

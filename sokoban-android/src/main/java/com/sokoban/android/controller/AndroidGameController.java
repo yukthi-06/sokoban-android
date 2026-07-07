@@ -1,10 +1,10 @@
-package com.sokoban.android.controller;
+package com.vypeensoft.sokoban.android.controller;
 
 import android.content.Context;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import com.sokoban.engine.model.Direction;
+import com.vypeensoft.sokoban.engine.model.Direction;
 
 public final class AndroidGameController implements View.OnTouchListener {
 

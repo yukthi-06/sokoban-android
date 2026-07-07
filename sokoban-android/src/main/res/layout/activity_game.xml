@@ -155,7 +155,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <!-- Custom Canvas View -->
-    <com.sokoban.android.view.GameView
+    <com.vypeensoft.sokoban.android.view.GameView
         android:id="@+id/gameView"
         android:layout_width="0dp"
         android:layout_height="0dp"

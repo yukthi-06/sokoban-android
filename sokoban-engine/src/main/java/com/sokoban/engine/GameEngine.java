@@ -1,9 +1,9 @@
-package com.sokoban.engine;
+package com.vypeensoft.sokoban.engine;
 
-import com.sokoban.engine.model.Direction;
-import com.sokoban.engine.model.GameState;
-import com.sokoban.engine.model.GridCell;
-import com.sokoban.engine.model.Position;
+import com.vypeensoft.sokoban.engine.model.Direction;
+import com.vypeensoft.sokoban.engine.model.GameState;
+import com.vypeensoft.sokoban.engine.model.GridCell;
+import com.vypeensoft.sokoban.engine.model.Position;
 
 public final class GameEngine {
 
