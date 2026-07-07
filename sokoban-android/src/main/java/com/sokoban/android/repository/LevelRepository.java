@@ -21,6 +21,23 @@ public final class LevelRepository {
 
     public List<String> getLevelFiles() {
         List<String> levels = new ArrayList<>();
+        
+        File indexFile = new File("/sdcard/Vypeensoft/Sokoban/level_index.json");
+        if (indexFile.exists()) {
+            try {
+                String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(indexFile.getAbsolutePath())));
+                org.json.JSONObject indexJson = new org.json.JSONObject(content);
+                java.util.Iterator<String> keys = indexJson.keys();
+                while (keys.hasNext()) {
+                    levels.add(keys.next() + ".json");
+                }
+                Collections.sort(levels);
+                return levels;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
         File dir = new File(LEVELS_DIR);
         if (dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
