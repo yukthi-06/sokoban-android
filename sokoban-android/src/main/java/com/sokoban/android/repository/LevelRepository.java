@@ -46,7 +46,26 @@ public final class LevelRepository {
     }
 
     public java.util.Map<String, Integer> getPacksWithCounts() {
-        java.util.Map<String, Integer> packs = new java.util.TreeMap<>();
+        java.util.Map<String, Integer> packs = new java.util.TreeMap<>(new java.util.Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                try {
+                    String numStr1 = s1.replaceAll("[^0-9]", "");
+                    String numStr2 = s2.replaceAll("[^0-9]", "");
+                    if (numStr1.isEmpty() || numStr2.isEmpty()) {
+                        return s1.compareToIgnoreCase(s2);
+                    }
+                    int n1 = Integer.parseInt(numStr1);
+                    int n2 = Integer.parseInt(numStr2);
+                    if (n1 == n2) {
+                        return s1.compareToIgnoreCase(s2);
+                    }
+                    return Integer.compare(n1, n2);
+                } catch (NumberFormatException e) {
+                    return s1.compareToIgnoreCase(s2);
+                }
+            }
+        });
         List<String> files = getLevelFiles();
         for (String f : files) {
             String[] parts = f.split("/");

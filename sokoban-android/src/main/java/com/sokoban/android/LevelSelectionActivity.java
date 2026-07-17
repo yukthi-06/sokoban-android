@@ -34,8 +34,12 @@ public final class LevelSelectionActivity extends AppCompatActivity {
 
         packName = getIntent().getStringExtra(EXTRA_PACK_NAME);
         if (packName != null) {
+            String displayTitle = packName;
+            if (!displayTitle.toLowerCase().startsWith("pack")) {
+                displayTitle = "Pack " + displayTitle;
+            }
             TextView subtitle = findViewById(R.id.selectLevelSubtitle);
-            subtitle.setText("Select Level - " + packName);
+            subtitle.setText("Select Level - " + displayTitle);
         }
 
         repository = new LevelRepository(this);

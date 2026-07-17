@@ -25,7 +25,7 @@ public class PackAdapter extends RecyclerView.Adapter<PackAdapter.PackViewHolder
     @NonNull
     @Override
     public PackViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_level, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_pack, parent, false);
         return new PackViewHolder(view);
     }
 
@@ -34,9 +34,13 @@ public class PackAdapter extends RecyclerView.Adapter<PackAdapter.PackViewHolder
         String packName = packNames.get(position);
         int count = packCounts.getOrDefault(packName, 0);
         
-        holder.levelNumberText.setText(packName + "\n(" + count + ")");
-        holder.levelNumberText.setTextSize(18f); // Make text smaller to fit Pack Name
-        holder.tickMarkText.setVisibility(View.GONE); // No tick mark for packs yet
+        String displayTitle = packName;
+        if (!displayTitle.toLowerCase().startsWith("pack")) {
+            displayTitle = "Pack " + displayTitle;
+        }
+        
+        holder.levelNumberText.setText(displayTitle + " (" + count + ")");
+        holder.tickMarkText.setVisibility(View.GONE);
         
         holder.levelCard.setOnClickListener(v -> onPackClick.accept(packName));
     }
