@@ -26,12 +26,13 @@
             android:id="@+id/levelNumberText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|start"
+            android:layout_gravity="center"
             android:layout_margin="16dp"
             android:text="Pack 1 (50)"
             android:textColor="@color/accent"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textAlignment="center" />
 
         <TextView
             android:id="@+id/tickMarkText"

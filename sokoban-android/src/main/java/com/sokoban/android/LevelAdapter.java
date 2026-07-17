@@ -25,7 +25,7 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHol
     @NonNull
     @Override
     public LevelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_level, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_pack, parent, false);
         return new LevelViewHolder(view);
     }
 
@@ -36,8 +36,12 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHol
         // Remove .json extension
         String rawName = fileName.replace(".json", "");
         
+        // Remove pack prefix
+        String[] parts = rawName.split("/");
+        String baseName = parts.length > 0 ? parts[parts.length - 1] : rawName;
+        
         // Remove spaces
-        String displayName = rawName.replaceAll("\\s+", "");
+        String displayName = baseName.replaceAll("\\s+", "");
         
         // Remove leading zeroes
         displayName = displayName.replaceFirst("^0+(?!$)", "");
@@ -46,8 +50,10 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHol
 
         if (completedLevels != null && completedLevels.contains(rawName)) {
             holder.tickMarkText.setVisibility(View.VISIBLE);
+            holder.levelNumberText.setTextColor(android.graphics.Color.parseColor("#4CAF50"));
         } else {
             holder.tickMarkText.setVisibility(View.GONE);
+            holder.levelNumberText.setTextColor(androidx.core.content.ContextCompat.getColor(holder.itemView.getContext(), R.color.accent));
         }
         
         // Attach click listener directly to the card view, since it consumes clicks
