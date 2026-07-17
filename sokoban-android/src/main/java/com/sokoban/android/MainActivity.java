@@ -156,6 +156,20 @@ public final class MainActivity extends AppCompatActivity {
                 if (levelFiles != null) {
                     for (String f : levelFiles) {
                         String rawName = f.replace(".json", "");
+                        String[] parts = rawName.split("/");
+                        if (parts.length < 2) continue;
+                        
+                        String packName = parts[0];
+                        String levelName = parts[1];
+                        
+                        org.json.JSONObject packObj;
+                        if (indexJson.has(packName)) {
+                            packObj = indexJson.getJSONObject(packName);
+                        } else {
+                            packObj = new org.json.JSONObject();
+                            indexJson.put(packName, packObj);
+                        }
+                        
                         org.json.JSONObject levelObj = new org.json.JSONObject();
                         
                         // Check completion
@@ -176,7 +190,7 @@ public final class MainActivity extends AppCompatActivity {
                         }
                         levelObj.put("liked", likedState);
                         
-                        indexJson.put(rawName, levelObj);
+                        packObj.put(levelName, levelObj);
                     }
                 }
                 

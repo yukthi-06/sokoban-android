@@ -60,15 +60,21 @@ public final class LevelSelectionActivity extends AppCompatActivity {
             try {
                 String content = new String(Files.readAllBytes(Paths.get(indexFile.getAbsolutePath())));
                 org.json.JSONObject indexJson = new org.json.JSONObject(content);
-                java.util.Iterator<String> keys = indexJson.keys();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    org.json.JSONObject levelObj = indexJson.getJSONObject(key);
-                    if (levelObj.optBoolean("completed", false)) {
-                        completedLevels.add(key);
-                    }
-                    if ("dislike".equals(levelObj.optString("liked", "neutral"))) {
-                        dislikedLevels.add(key);
+                
+                if (packName != null && indexJson.has(packName)) {
+                    org.json.JSONObject packObj = indexJson.getJSONObject(packName);
+                    java.util.Iterator<String> keys = packObj.keys();
+                    while (keys.hasNext()) {
+                        String levelName = keys.next();
+                        org.json.JSONObject levelObj = packObj.getJSONObject(levelName);
+                        // The key used in completedLevels is the rawName "packName/levelName"
+                        String rawName = packName + "/" + levelName;
+                        if (levelObj.optBoolean("completed", false)) {
+                            completedLevels.add(rawName);
+                        }
+                        if ("dislike".equals(levelObj.optString("liked", "neutral"))) {
+                            dislikedLevels.add(rawName);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -76,19 +82,20 @@ public final class LevelSelectionActivity extends AppCompatActivity {
             }
         } else {
             // Fallback to legacy crawling
-            File solDir = new File("/sdcard/Vypeensoft/Sokoban/solutions/");
+            File solDir = new File("/sdcard/Vypeensoft/Sokoban/solutions/" + (packName != null ? packName : ""));
             if (solDir.exists() && solDir.isDirectory()) {
                 File[] files = solDir.listFiles();
                 if (files != null) {
                     for (File f : files) {
                         if (f.getName().endsWith("_solution.json")) {
-                            completedLevels.add(f.getName().replace("_solution.json", ""));
+                            String levelName = f.getName().replace("_solution.json", "");
+                            completedLevels.add(packName != null ? packName + "/" + levelName : levelName);
                         }
                     }
                 }
             }
 
-            File ldDir = new File("/sdcard/Vypeensoft/Sokoban/like_dislike/");
+            File ldDir = new File("/sdcard/Vypeensoft/Sokoban/like_dislike/" + (packName != null ? packName : ""));
             if (ldDir.exists() && ldDir.isDirectory()) {
                 File[] files = ldDir.listFiles();
                 if (files != null) {
@@ -98,7 +105,8 @@ public final class LevelSelectionActivity extends AppCompatActivity {
                                 String content = new String(Files.readAllBytes(Paths.get(f.getAbsolutePath())));
                                 org.json.JSONObject ldJson = new org.json.JSONObject(content);
                                 if ("dislike".equals(ldJson.optString("state", ""))) {
-                                    dislikedLevels.add(f.getName().replace(".json", ""));
+                                    String levelName = f.getName().replace(".json", "");
+                                    dislikedLevels.add(packName != null ? packName + "/" + levelName : levelName);
                                 }
                             } catch (Exception e) {}
                         }
