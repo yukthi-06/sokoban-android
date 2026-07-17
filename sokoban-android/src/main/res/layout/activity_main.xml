@@ -94,7 +94,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="4"
+        app:spanCount="2"
         tools:listitem="@layout/item_level"
         app:layout_constraintTop_toBottomOf="@id/selectLevelSubtitle"
         app:layout_constraintBottom_toBottomOf="parent"

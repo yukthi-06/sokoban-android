@@ -395,9 +395,11 @@ public final class GameActivity extends AppCompatActivity {
         btnLike.setAlpha("like".equals(state) ? 1.0f : 0.5f);
         btnDislike.setAlpha("dislike".equals(state) ? 1.0f : 0.5f);
         try {
-            File dir = new File(LIKE_DISLIKE_DIR);
-            if (!dir.exists()) dir.mkdirs();
             File f = new File(LIKE_DISLIKE_DIR, rawFileName + ".json");
+            File parentDir = f.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
             
             if ("neutral".equals(state)) {
                 if (f.exists()) f.delete();
@@ -552,12 +554,12 @@ public final class GameActivity extends AppCompatActivity {
     private void saveSolution(String displayName) {
         long timeTaken = (System.currentTimeMillis() - startTime) / 1000;
         
-        File dir = new File(SOLUTIONS_DIR);
-        if (!dir.exists()) {
-            dir.mkdirs();
+        File solutionFile = new File(SOLUTIONS_DIR, displayName + "_solution.json");
+        File parentDir = solutionFile.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
         }
         
-        File solutionFile = new File(dir, displayName + "_solution.json");
         try {
             JSONObject json = new JSONObject();
             json.put("moves count", currentState.getMovesCount());

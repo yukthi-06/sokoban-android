@@ -200,88 +200,18 @@ public final class MainActivity extends AppCompatActivity {
 
     private void initializeDashboard() {
         loadSettingsFromJson();
-        levelFiles = repository.getLevelFiles();
-        if (levelFiles == null || levelFiles.isEmpty()) return;
-
-        java.util.Set<String> completedLevels = new java.util.HashSet<>();
-        java.util.Set<String> dislikedLevels = new java.util.HashSet<>();
-        
-        java.io.File indexFile = new java.io.File("/sdcard/Vypeensoft/Sokoban/level_index.json");
-        if (indexFile.exists()) {
-            try {
-                String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(indexFile.getAbsolutePath())));
-                org.json.JSONObject indexJson = new org.json.JSONObject(content);
-                java.util.Iterator<String> keys = indexJson.keys();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    org.json.JSONObject levelObj = indexJson.getJSONObject(key);
-                    if (levelObj.optBoolean("completed", false)) {
-                        completedLevels.add(key);
-                    }
-                    if ("dislike".equals(levelObj.optString("liked", "neutral"))) {
-                        dislikedLevels.add(key);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            // Fallback to legacy crawling
-            java.io.File solDir = new java.io.File("/sdcard/Vypeensoft/Sokoban/solutions/");
-            if (solDir.exists() && solDir.isDirectory()) {
-                java.io.File[] files = solDir.listFiles();
-                if (files != null) {
-                    for (java.io.File f : files) {
-                        if (f.getName().endsWith("_solution.json")) {
-                            completedLevels.add(f.getName().replace("_solution.json", ""));
-                        }
-                    }
-                }
-            }
-            
-            java.io.File ldDir = new java.io.File("/sdcard/Vypeensoft/Sokoban/like_dislike/");
-            if (ldDir.exists() && ldDir.isDirectory()) {
-                java.io.File[] files = ldDir.listFiles();
-                if (files != null) {
-                    for (java.io.File f : files) {
-                        if (f.getName().endsWith(".json")) {
-                            try {
-                                String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(f.getAbsolutePath())));
-                                org.json.JSONObject ldJson = new org.json.JSONObject(content);
-                                if ("dislike".equals(ldJson.optString("state", ""))) {
-                                    dislikedLevels.add(f.getName().replace(".json", ""));
-                                }
-                            } catch (Exception e) {}
-                        }
-                    }
-                }
-            }
+        java.util.Map<String, Integer> packs = repository.getPacksWithCounts();
+        if (packs == null || packs.isEmpty()) {
+            Toast.makeText(this, "No packs found in /sdcard/Vypeensoft/Sokoban/levels/", Toast.LENGTH_LONG).show();
+            return;
         }
 
-        android.content.SharedPreferences prefs = getSharedPreferences("SokobanPrefs", android.content.Context.MODE_PRIVATE);
-        boolean showCompleted = prefs.getBoolean("show_completed", true);
-        boolean showDisliked = prefs.getBoolean("show_disliked", true);
+        java.util.List<String> packNames = new java.util.ArrayList<>(packs.keySet());
+        Toast.makeText(this, "Found " + packNames.size() + " packs!", Toast.LENGTH_SHORT).show();
 
-        java.util.List<String> displayFiles = new java.util.ArrayList<>();
-        java.util.List<Integer> displayIndices = new java.util.ArrayList<>();
-        
-        for (int i = 0; i < levelFiles.size(); i++) {
-            String f = levelFiles.get(i);
-            String rawName = f.replace(".json", "");
-            if (!showCompleted && completedLevels.contains(rawName)) {
-                continue;
-            }
-            if (!showDisliked && dislikedLevels.contains(rawName)) {
-                continue;
-            }
-            displayFiles.add(f);
-            displayIndices.add(i);
-        }
-
-        LevelAdapter adapter = new LevelAdapter(displayFiles, completedLevels, position -> {
-            int originalIndex = displayIndices.get(position);
-            Intent intent = new Intent(MainActivity.this, GameActivity.class);
-            intent.putExtra(GameActivity.EXTRA_LEVEL_INDEX, originalIndex);
+        PackAdapter adapter = new PackAdapter(packNames, packs, packName -> {
+            Intent intent = new Intent(MainActivity.this, LevelSelectionActivity.class);
+            intent.putExtra(LevelSelectionActivity.EXTRA_PACK_NAME, packName);
             startActivity(intent);
         });
         

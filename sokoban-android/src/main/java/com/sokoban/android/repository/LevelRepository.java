@@ -22,35 +22,40 @@ public final class LevelRepository {
     public List<String> getLevelFiles() {
         List<String> levels = new ArrayList<>();
         
-        File indexFile = new File("/sdcard/Vypeensoft/Sokoban/level_index.json");
-        if (indexFile.exists()) {
-            try {
-                String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(indexFile.getAbsolutePath())));
-                org.json.JSONObject indexJson = new org.json.JSONObject(content);
-                java.util.Iterator<String> keys = indexJson.keys();
-                while (keys.hasNext()) {
-                    levels.add(keys.next() + ".json");
-                }
-                Collections.sort(levels);
-                return levels;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        
+
         File dir = new File(LEVELS_DIR);
         if (dir.exists() && dir.isDirectory()) {
-            File[] files = dir.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile() && file.getName().endsWith(".json")) {
-                        levels.add(file.getName());
+            File[] packDirs = dir.listFiles();
+            if (packDirs != null) {
+                for (File packDir : packDirs) {
+                    if (packDir.isDirectory()) {
+                        File[] files = packDir.listFiles();
+                        if (files != null) {
+                            for (File file : files) {
+                                if (file.isFile() && file.getName().endsWith(".json")) {
+                                    levels.add(packDir.getName() + "/" + file.getName());
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
         Collections.sort(levels);
         return levels;
+    }
+
+    public java.util.Map<String, Integer> getPacksWithCounts() {
+        java.util.Map<String, Integer> packs = new java.util.TreeMap<>();
+        List<String> files = getLevelFiles();
+        for (String f : files) {
+            String[] parts = f.split("/");
+            if (parts.length >= 2) {
+                String packName = parts[0];
+                packs.put(packName, packs.getOrDefault(packName, 0) + 1);
+            }
+        }
+        return packs;
     }
 
     public GameState loadLevel(String fileName) {
