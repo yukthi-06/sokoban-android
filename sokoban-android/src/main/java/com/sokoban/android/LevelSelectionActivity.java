@@ -82,7 +82,7 @@ public final class LevelSelectionActivity extends AppCompatActivity {
             }
         } else {
             // Fallback to legacy crawling
-            File solDir = new File("/sdcard/Vypeensoft/Sokoban/solutions/" + (packName != null ? packName : ""));
+            File solDir = new File("/sdcard/Vypeensoft/Sokoban/solutions/");
             if (solDir.exists() && solDir.isDirectory()) {
                 File[] files = solDir.listFiles();
                 if (files != null) {
@@ -95,7 +95,7 @@ public final class LevelSelectionActivity extends AppCompatActivity {
                 }
             }
 
-            File ldDir = new File("/sdcard/Vypeensoft/Sokoban/like_dislike/" + (packName != null ? packName : ""));
+            File ldDir = new File("/sdcard/Vypeensoft/Sokoban/like_dislike/");
             if (ldDir.exists() && ldDir.isDirectory()) {
                 File[] files = ldDir.listFiles();
                 if (files != null) {

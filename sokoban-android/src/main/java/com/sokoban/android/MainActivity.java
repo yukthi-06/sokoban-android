@@ -173,11 +173,11 @@ public final class MainActivity extends AppCompatActivity {
                         org.json.JSONObject levelObj = new org.json.JSONObject();
                         
                         // Check completion
-                        java.io.File solFile = new java.io.File(solDir, rawName + "_solution.json");
+                        java.io.File solFile = new java.io.File(solDir, levelName + "_solution.json");
                         levelObj.put("completed", solFile.exists());
                         
                         // Check like/dislike
-                        java.io.File ldFile = new java.io.File(ldDir, rawName + ".json");
+                        java.io.File ldFile = new java.io.File(ldDir, levelName + ".json");
                         String likedState = "neutral";
                         if (ldFile.exists()) {
                             try {

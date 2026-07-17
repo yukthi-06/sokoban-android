@@ -40,6 +40,7 @@ public final class GameActivity extends AppCompatActivity {
     private long startTime;
     private String currentDisplayName;
     private String rawFileName;
+    private String baseFileName;
     
     private static final String SOLUTIONS_DIR = "/sdcard/Vypeensoft/Sokoban/solutions/";
 
@@ -224,7 +225,11 @@ public final class GameActivity extends AppCompatActivity {
         String fileName = levelFiles.get(index);
         
         rawFileName = fileName.replace(".json", "");
-        currentDisplayName = rawFileName
+        
+        String[] parts = rawFileName.split("/");
+        baseFileName = parts.length > 0 ? parts[parts.length - 1] : rawFileName;
+        
+        currentDisplayName = baseFileName
                                      .replaceAll("\\s+", "")
                                      .replaceFirst("^0+(?!$)", "");
         
@@ -234,7 +239,7 @@ public final class GameActivity extends AppCompatActivity {
         bestPushes = -1;
         bestTime = -1;
 
-        File solutionFile = new File(SOLUTIONS_DIR, rawFileName + "_solution.json");
+        File solutionFile = new File(SOLUTIONS_DIR, baseFileName + "_solution.json");
         if (solutionFile.exists()) {
             levelTitleText.setText("Level " + currentDisplayName + " (Solved)");
             levelTitleText.setTextColor(Color.parseColor("#4CAF50")); // Green
@@ -297,7 +302,10 @@ public final class GameActivity extends AppCompatActivity {
     private boolean isDisliked(int index) {
         String fileName = levelFiles.get(index);
         String rawName = fileName.replace(".json", "");
-        File likeDislikeFile = new File(LIKE_DISLIKE_DIR, rawName + ".json");
+        String[] parts = rawName.split("/");
+        String baseName = parts.length > 0 ? parts[parts.length - 1] : rawName;
+        
+        File likeDislikeFile = new File(LIKE_DISLIKE_DIR, baseName + ".json");
         if (likeDislikeFile.exists()) {
             try {
                 String content = new String(Files.readAllBytes(Paths.get(likeDislikeFile.getAbsolutePath())));
@@ -313,7 +321,10 @@ public final class GameActivity extends AppCompatActivity {
     private boolean isCompleted(int index) {
         String fileName = levelFiles.get(index);
         String rawName = fileName.replace(".json", "");
-        File solutionFile = new File(SOLUTIONS_DIR, rawName + "_solution.json");
+        String[] parts = rawName.split("/");
+        String baseName = parts.length > 0 ? parts[parts.length - 1] : rawName;
+        
+        File solutionFile = new File(SOLUTIONS_DIR, baseName + "_solution.json");
         return solutionFile.exists();
     }
 
@@ -371,7 +382,7 @@ public final class GameActivity extends AppCompatActivity {
         currentLikeState = "neutral";
         File dir = new File(LIKE_DISLIKE_DIR);
         if (!dir.exists()) dir.mkdirs();
-        File f = new File(LIKE_DISLIKE_DIR, rawFileName + ".json");
+        File f = new File(LIKE_DISLIKE_DIR, baseFileName + ".json");
         if (f.exists()) {
             try {
                 String content = new String(Files.readAllBytes(Paths.get(f.getAbsolutePath())));
@@ -395,11 +406,7 @@ public final class GameActivity extends AppCompatActivity {
         btnLike.setAlpha("like".equals(state) ? 1.0f : 0.5f);
         btnDislike.setAlpha("dislike".equals(state) ? 1.0f : 0.5f);
         try {
-            File f = new File(LIKE_DISLIKE_DIR, rawFileName + ".json");
-            File parentDir = f.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
-            }
+            File f = new File(LIKE_DISLIKE_DIR, baseFileName + ".json");
             
             if ("neutral".equals(state)) {
                 if (f.exists()) f.delete();
@@ -546,19 +553,15 @@ public final class GameActivity extends AppCompatActivity {
         updateUI();
 
         if (GameEngine.isWin(currentState)) {
-            saveSolution(rawFileName);
+            saveSolution();
             showWinDialog();
         }
     }
 
-    private void saveSolution(String displayName) {
+    private void saveSolution() {
         long timeTaken = (System.currentTimeMillis() - startTime) / 1000;
         
-        File solutionFile = new File(SOLUTIONS_DIR, displayName + "_solution.json");
-        File parentDir = solutionFile.getParentFile();
-        if (parentDir != null && !parentDir.exists()) {
-            parentDir.mkdirs();
-        }
+        File solutionFile = new File(SOLUTIONS_DIR, baseFileName + "_solution.json");
         
         try {
             JSONObject json = new JSONObject();
