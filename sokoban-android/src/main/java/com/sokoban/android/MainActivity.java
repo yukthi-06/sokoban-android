@@ -148,10 +148,14 @@ public final class MainActivity extends AppCompatActivity {
                 org.json.JSONObject indexJson = new org.json.JSONObject();
                 java.io.File solDir = new java.io.File("/sdcard/Vypeensoft/Sokoban/solutions/");
                 java.io.File ldDir = new java.io.File("/sdcard/Vypeensoft/Sokoban/like_dislike/");
+                java.io.File indexFile = new java.io.File("/sdcard/Vypeensoft/Sokoban/level_index.json");
                 
-                if (levelFiles == null) {
-                    levelFiles = repository.getLevelFiles();
+                // Force a fresh scan by deleting the old index first
+                if (indexFile.exists()) {
+                    indexFile.delete();
                 }
+                
+                levelFiles = repository.getLevelFiles();
                 
                 if (levelFiles != null) {
                     for (String f : levelFiles) {
@@ -194,7 +198,6 @@ public final class MainActivity extends AppCompatActivity {
                     }
                 }
                 
-                java.io.File indexFile = new java.io.File("/sdcard/Vypeensoft/Sokoban/level_index.json");
                 try (java.io.FileWriter writer = new java.io.FileWriter(indexFile)) {
                     writer.write(indexJson.toString(4));
                 }
@@ -216,12 +219,10 @@ public final class MainActivity extends AppCompatActivity {
         loadSettingsFromJson();
         java.util.Map<String, Integer> packs = repository.getPacksWithCounts();
         if (packs == null || packs.isEmpty()) {
-            Toast.makeText(this, "No packs found in /sdcard/Vypeensoft/Sokoban/levels/", Toast.LENGTH_LONG).show();
             return;
         }
 
         java.util.List<String> packNames = new java.util.ArrayList<>(packs.keySet());
-        Toast.makeText(this, "Found " + packNames.size() + " packs!", Toast.LENGTH_SHORT).show();
 
         PackAdapter adapter = new PackAdapter(packNames, packs, packName -> {
             Intent intent = new Intent(MainActivity.this, LevelSelectionActivity.class);
